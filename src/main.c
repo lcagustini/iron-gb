@@ -39,6 +39,10 @@
 #define WX 0xFF4B
 #define IE 0xFFFF
 
+#define bool uint8_t
+#define true 1
+#define false 0
+
 struct {
     struct {
         union {
@@ -84,6 +88,7 @@ struct {
     uint16_t pc;
 } rb;
 uint8_t ram[0xFFFF];
+bool IME;
 
 void nextInstruction() {
     printf("A: %02X F: %02X AF: %04X (", rb.a, rb.f, rb.af);
@@ -269,11 +274,39 @@ void nextInstruction() {
                 rb.pc += 2;
             }
             break;
+        case 0x47:
+            {
+                rb.b = rb.a;
+
+                printf("LD B, A");
+                rb.pc++;
+            }
+            break;
+        case 0x4F:
+            {
+                rb.c = rb.a;
+
+                printf("LD C, A");
+                rb.pc++;
+            }
+            break;
         case 0x78:
             {
                 rb.a = rb.b;
 
                 printf("LD A, B");
+                rb.pc++;
+            }
+            break;
+        case 0xA9:
+            {
+                rb.a = rb.a ^ rb.c;
+
+                if (rb.a == 0) rb.f |= 0b10000000;
+                else rb.f &= 0b01111111;
+                rb.f &= 0b10001111;
+
+                printf("XOR C");
                 rb.pc++;
             }
             break;
@@ -284,6 +317,18 @@ void nextInstruction() {
                 rb.f = 0b10000000;
 
                 printf("XOR A");
+                rb.pc++;
+            }
+            break;
+        case 0xB0:
+            {
+                rb.a = rb.a | rb.b;
+
+                if (rb.a == 0) rb.f |= 0b10000000;
+                else rb.f &= 0b01111111;
+                rb.f &= 0b10001111;
+
+                printf("OR B");
                 rb.pc++;
             }
             break;
@@ -320,6 +365,14 @@ void nextInstruction() {
                 rb.pc++;
                 uint8_t byte = ram[rb.pc];
                 switch (byte) {
+                    case 0x37:
+                        {
+                            rb.a = rb.a >> 4 | rb.a << 4;
+
+                            printf("SWAP A");
+                            rb.pc++;
+                        }
+                        break;
                     default:
                         printf("\nUnimplemented extended instruction: CB%02X\n", byte);
                         exit(1);
@@ -394,7 +447,7 @@ void nextInstruction() {
             break;
         case 0xF3:
             {
-                // TODO: Disable interrupts
+                IME = false;
 
                 printf("DI");
                 rb.pc++;
@@ -402,7 +455,7 @@ void nextInstruction() {
             break;
         case 0xFB:
             {
-                // TODO: Enable interrupts
+                IME = true;
 
                 printf("EI");
                 rb.pc++;
@@ -432,6 +485,8 @@ void nextInstruction() {
 }
 
 void reset() {
+    IME = false;
+
     rb.f = 0xB0;
     rb.bc = 0x13;
     rb.de = 0xD8;
