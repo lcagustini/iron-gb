@@ -1,3 +1,5 @@
+#include <SDL2/SDL.h>
+
 #include <unistd.h>
 
 #include <stdint.h>
@@ -95,8 +97,13 @@ struct {
     uint16_t sp;
     uint16_t pc;
 } rb;
+uint64_t clock;
 uint8_t ram[0xFFFF];
 bool IME;
+enum {
+    MAPPED,
+    UNMAPPED,
+} BIOS;
 
 void nextInstruction() {
     printf(COLOR_YELLOW "A:" COLOR_RESET " %02X " COLOR_YELLOW "F:" COLOR_RESET " %02X " COLOR_YELLOW "AF:" COLOR_RESET " %04X " COLOR_BLUE "(", rb.a, rb.f, rb.af);
@@ -120,6 +127,8 @@ void nextInstruction() {
             {
                 printf("NOP");
                 rb.pc++;
+
+                clock += 4;
             }
             break;
         case 0x01:
@@ -130,6 +139,8 @@ void nextInstruction() {
 
                 printf("LD BC, 0x%04X", imm);
                 rb.pc += 3;
+
+                clock += 12;
             }
             break;
         case 0x02:
@@ -138,6 +149,8 @@ void nextInstruction() {
 
                 printf("LD (BC), A");
                 rb.pc++;
+
+                clock += 8;
             }
             break;
         case 0x03:
@@ -146,6 +159,8 @@ void nextInstruction() {
 
                 printf("INC BC");
                 rb.pc++;
+
+                clock += 8;
             }
             break;
         case 0x04:
@@ -159,6 +174,8 @@ void nextInstruction() {
 
                 printf("INC B");
                 rb.pc++;
+
+                clock += 4;
             }
             break;
         case 0x05:
@@ -172,6 +189,8 @@ void nextInstruction() {
 
                 printf("DEC B");
                 rb.pc++;
+
+                clock += 4;
             }
             break;
         case 0x06:
@@ -182,6 +201,8 @@ void nextInstruction() {
 
                 printf("LD B, 0x%02X", imm);
                 rb.pc += 2;
+
+                clock += 8;
             }
             break;
         case 0x0B:
@@ -190,6 +211,8 @@ void nextInstruction() {
 
                 printf("DEC BC");
                 rb.pc++;
+
+                clock += 8;
             }
             break;
         case 0x0C:
@@ -203,6 +226,8 @@ void nextInstruction() {
 
                 printf("INC C");
                 rb.pc++;
+
+                clock += 4;
             }
             break;
         case 0x0D:
@@ -216,6 +241,8 @@ void nextInstruction() {
 
                 printf("DEC C");
                 rb.pc++;
+
+                clock += 4;
             }
             break;
         case 0x0E:
@@ -226,6 +253,8 @@ void nextInstruction() {
 
                 printf("LD C, 0x%02X", imm);
                 rb.pc += 2;
+
+                clock += 8;
             }
             break;
         case 0x11:
@@ -236,6 +265,8 @@ void nextInstruction() {
 
                 printf("LD DE, 0x%04X", imm);
                 rb.pc += 3;
+
+                clock += 12;
             }
             break;
         case 0x13:
@@ -244,6 +275,23 @@ void nextInstruction() {
 
                 printf("INC DE");
                 rb.pc++;
+
+                clock += 8;
+            }
+            break;
+        case 0x15:
+            {
+                rb.d--;
+
+                if (rb.d == 0) rb.f |= 0b10000000;
+                else rb.f &= 0b01111111;
+                rb.f |= 0b01000000;
+                // TODO: half-carry flag
+
+                printf("DEC D");
+                rb.pc++;
+
+                clock += 4;
             }
             break;
         case 0x16:
@@ -254,6 +302,8 @@ void nextInstruction() {
 
                 printf("LD D, 0x%02X", imm);
                 rb.pc += 2;
+
+                clock += 8;
             }
             break;
         case 0x17:
@@ -271,6 +321,8 @@ void nextInstruction() {
 
                 printf("RL A");
                 rb.pc++;
+
+                clock += 8;
             }
             break;
         case 0x18:
@@ -282,6 +334,8 @@ void nextInstruction() {
 
                 printf("JR %s0x%02X", imm < 0 ? "-" : "", imm < 0 ? -imm : imm);
                 rb.pc += 2;
+
+                clock += 12;
             }
             break;
         case 0x19:
@@ -296,6 +350,8 @@ void nextInstruction() {
 
                 printf("ADD HL, DE");
                 rb.pc++;
+
+                clock += 8;
             }
             break;
         case 0x1A:
@@ -304,6 +360,23 @@ void nextInstruction() {
 
                 printf("LD A, (DE)");
                 rb.pc++;
+
+                clock += 8;
+            }
+            break;
+        case 0x1D:
+            {
+                rb.e--;
+
+                if (rb.e == 0) rb.f |= 0b10000000;
+                else rb.f &= 0b01111111;
+                rb.f |= 0b01000000;
+                // TODO: half-carry flag
+
+                printf("DEC E");
+                rb.pc++;
+
+                clock += 4;
             }
             break;
         case 0x1E:
@@ -314,6 +387,8 @@ void nextInstruction() {
 
                 printf("LD E, 0x%02X", imm);
                 rb.pc += 2;
+
+                clock += 8;
             }
             break;
         case 0x20:
@@ -323,6 +398,11 @@ void nextInstruction() {
                 if (!(rb.f & 0b10000000)) {
                     if (imm >= 0) rb.pc += imm;
                     else rb.pc -= (uint8_t) (-imm);
+
+                    clock += 12;
+                }
+                else {
+                    clock += 8;
                 }
 
                 printf("JR NZ, %s0x%02X", imm < 0 ? "-" : "", imm < 0 ? -imm : imm);
@@ -337,6 +417,8 @@ void nextInstruction() {
 
                 printf("LD HL, 0x%04X", imm);
                 rb.pc += 3;
+
+                clock += 12;
             }
             break;
         case 0x22:
@@ -346,6 +428,8 @@ void nextInstruction() {
 
                 printf("LDI (HL), A");
                 rb.pc++;
+
+                clock += 8;
             }
             break;
         case 0x23:
@@ -354,6 +438,23 @@ void nextInstruction() {
 
                 printf("INC HL");
                 rb.pc++;
+
+                clock += 8;
+            }
+            break;
+        case 0x24:
+            {
+                rb.h++;
+
+                if (rb.h == 0) rb.f |= 0b10000000;
+                else rb.f &= 0b01111111;
+                rb.f &= 0b10111111;
+                // TODO: half-carry flag
+
+                printf("INC H");
+                rb.pc++;
+
+                clock += 4;
             }
             break;
         case 0x28:
@@ -363,6 +464,11 @@ void nextInstruction() {
                 if (rb.f & 0b10000000) {
                     if (imm >= 0) rb.pc += imm;
                     else rb.pc -= (uint8_t) (-imm);
+
+                    clock += 12;
+                }
+                else {
+                    clock += 8;
                 }
 
                 printf("JR Z, %s0x%02X", imm < 0 ? "-" : "", imm < 0 ? -imm : imm);
@@ -376,6 +482,8 @@ void nextInstruction() {
 
                 printf("LDI A, (HL)");
                 rb.pc++;
+
+                clock += 8;
             }
             break;
         case 0x2E:
@@ -386,6 +494,8 @@ void nextInstruction() {
 
                 printf("LD L, 0x%02X", imm);
                 rb.pc += 2;
+
+                clock += 8;
             }
             break;
         case 0x2F:
@@ -396,6 +506,8 @@ void nextInstruction() {
 
                 printf("CPL");
                 rb.pc++;
+
+                clock += 4;
             }
             break;
         case 0x31:
@@ -405,6 +517,8 @@ void nextInstruction() {
 
                 printf("LD SP, 0x%04X", imm);
                 rb.pc += 3;
+
+                clock += 12;
             }
             break;
         case 0x32:
@@ -414,16 +528,20 @@ void nextInstruction() {
 
                 printf("LDD (HL), A");
                 rb.pc++;
+
+                clock += 8;
             }
             break;
         case 0x36:
             {
                 uint8_t imm = ram[rb.pc+1];
 
-                rb.hl = imm;
+                ram[rb.hl] = imm;
 
                 printf("LD (HL), 0x%04X", imm);
                 rb.pc += 2;
+
+                clock += 12;
             }
             break;
         case 0x3D:
@@ -437,6 +555,8 @@ void nextInstruction() {
 
                 printf("DEC A");
                 rb.pc++;
+
+                clock += 4;
             }
             break;
         case 0x3E:
@@ -447,6 +567,8 @@ void nextInstruction() {
 
                 printf("LD A, 0x%02X", imm);
                 rb.pc += 2;
+
+                clock += 8;
             }
             break;
         case 0x47:
@@ -455,6 +577,8 @@ void nextInstruction() {
 
                 printf("LD B, A");
                 rb.pc++;
+
+                clock += 4;
             }
             break;
         case 0x4F:
@@ -463,6 +587,8 @@ void nextInstruction() {
 
                 printf("LD C, A");
                 rb.pc++;
+
+                clock += 4;
             }
             break;
         case 0x56:
@@ -471,6 +597,8 @@ void nextInstruction() {
 
                 printf("LD D, (HL)");
                 rb.pc++;
+
+                clock += 8;
             }
             break;
         case 0x57:
@@ -479,6 +607,8 @@ void nextInstruction() {
 
                 printf("LD D, A");
                 rb.pc++;
+
+                clock += 4;
             }
             break;
         case 0x5E:
@@ -487,6 +617,8 @@ void nextInstruction() {
 
                 printf("LD E, (HL)");
                 rb.pc++;
+
+                clock += 8;
             }
             break;
         case 0x5F:
@@ -495,6 +627,8 @@ void nextInstruction() {
 
                 printf("LD E, A");
                 rb.pc++;
+
+                clock += 4;
             }
             break;
         case 0x67:
@@ -503,6 +637,8 @@ void nextInstruction() {
 
                 printf("LD H, A");
                 rb.pc++;
+
+                clock += 4;
             }
             break;
         case 0x77:
@@ -511,6 +647,8 @@ void nextInstruction() {
 
                 printf("LD (HL), A");
                 rb.pc++;
+
+                clock += 8;
             }
             break;
         case 0x78:
@@ -519,6 +657,8 @@ void nextInstruction() {
 
                 printf("LD A, B");
                 rb.pc++;
+
+                clock += 4;
             }
             break;
         case 0x79:
@@ -527,6 +667,8 @@ void nextInstruction() {
 
                 printf("LD A, C");
                 rb.pc++;
+
+                clock += 4;
             }
             break;
         case 0x7B:
@@ -535,6 +677,18 @@ void nextInstruction() {
 
                 printf("LD A, E");
                 rb.pc++;
+
+                clock += 4;
+            }
+            break;
+        case 0x7C:
+            {
+                rb.a = rb.h;
+
+                printf("LD A, H");
+                rb.pc++;
+
+                clock += 4;
             }
             break;
         case 0x87:
@@ -550,6 +704,25 @@ void nextInstruction() {
 
                 printf("ADD A, A");
                 rb.pc++;
+
+                clock += 4;
+            }
+            break;
+        case 0x90:
+            {
+                uint16_t prev_a = rb.a;
+                rb.a = rb.a - rb.b;
+
+                if (rb.a == 0) rb.f |= 0b10000000;
+                else rb.f &= 0b01111111;
+                rb.f |= 0b01000000;
+                // TODO: Half carry flag
+                if (rb.a > prev_a) rb.f |= 0b00010000;
+
+                printf("SUB A, B");
+                rb.pc++;
+
+                clock += 4;
             }
             break;
         case 0xA1:
@@ -563,6 +736,8 @@ void nextInstruction() {
 
                 printf("AND C");
                 rb.pc++;
+
+                clock += 4;
             }
             break;
         case 0xA9:
@@ -575,6 +750,8 @@ void nextInstruction() {
 
                 printf("XOR C");
                 rb.pc++;
+
+                clock += 4;
             }
             break;
         case 0xAF:
@@ -585,6 +762,8 @@ void nextInstruction() {
 
                 printf("XOR A");
                 rb.pc++;
+
+                clock += 4;
             }
             break;
         case 0xB0:
@@ -597,6 +776,8 @@ void nextInstruction() {
 
                 printf("OR B");
                 rb.pc++;
+
+                clock += 4;
             }
             break;
         case 0xB1:
@@ -609,6 +790,8 @@ void nextInstruction() {
 
                 printf("OR C");
                 rb.pc++;
+
+                clock += 4;
             }
             break;
         case 0xC1:
@@ -619,6 +802,8 @@ void nextInstruction() {
 
                 printf("POP BC");
                 rb.pc++;
+
+                clock += 12;
             }
             break;
         case 0xC3:
@@ -627,6 +812,8 @@ void nextInstruction() {
 
                 printf("JP 0x%04X", addr);
                 rb.pc = addr;
+
+                clock += 16;
             }
             break;
         case 0xC5:
@@ -637,6 +824,8 @@ void nextInstruction() {
 
                 printf("PUSH BC");
                 rb.pc++;
+
+                clock += 16;
             }
             break;
         case 0xC9:
@@ -645,6 +834,8 @@ void nextInstruction() {
                 rb.sp += 2;
 
                 printf("RET");
+
+                clock += 16;
             }
             break;
         case 0xCB:
@@ -667,6 +858,8 @@ void nextInstruction() {
 
                             printf("RL C");
                             rb.pc++;
+
+                            clock += 8;
                         }
                         break;
                     case 0x37:
@@ -675,6 +868,8 @@ void nextInstruction() {
 
                             printf("SWAP A");
                             rb.pc++;
+
+                            clock += 8;
                         }
                         break;
                     case 0x7C:
@@ -684,6 +879,8 @@ void nextInstruction() {
 
                             printf("BIT 7, H");
                             rb.pc++;
+
+                            clock += 8;
                         }
                         break;
                     case 0xFE:
@@ -692,6 +889,8 @@ void nextInstruction() {
 
                             printf("SET 7, (HL)");
                             rb.pc++;
+
+                            clock += 16;
                         }
                         break;
                     default:
@@ -711,6 +910,8 @@ void nextInstruction() {
                 rb.sp -= 2;
 
                 printf("CALL 0x%04X", addr);
+
+                clock += 24;
             }
             break;
         case 0xD5:
@@ -721,6 +922,8 @@ void nextInstruction() {
 
                 printf("PUSH DE");
                 rb.pc++;
+
+                clock += 16;
             }
             break;
         case 0xE0:
@@ -731,6 +934,8 @@ void nextInstruction() {
 
                 printf("LDH (0x%04X), A", imm);
                 rb.pc += 2;
+
+                clock += 12;
             }
             break;
         case 0xE1:
@@ -741,6 +946,8 @@ void nextInstruction() {
 
                 printf("POP HL");
                 rb.pc++;
+
+                clock += 12;
             }
             break;
         case 0xE2:
@@ -751,6 +958,8 @@ void nextInstruction() {
 
                 printf("LDH (C), A", imm);
                 rb.pc++;
+
+                clock += 8;
             }
             break;
         case 0xE6:
@@ -765,6 +974,8 @@ void nextInstruction() {
 
                 printf("AND 0x%02X", imm);
                 rb.pc += 2;
+
+                clock += 8;
             }
             break;
         case 0xE9:
@@ -772,6 +983,8 @@ void nextInstruction() {
                 rb.pc = rb.hl;
 
                 printf("JP (HL)");
+
+                clock += 4;
             }
             break;
         case 0xEA:
@@ -781,6 +994,8 @@ void nextInstruction() {
 
                 printf("LD (0x%04X), A", addr);
                 rb.pc += 3;
+
+                clock += 16;
             }
             break;
         case 0xEF:
@@ -791,6 +1006,8 @@ void nextInstruction() {
                 rb.sp = rb.sp-2;
 
                 printf("RST 0x28");
+
+                clock += 16;
             }
             break;
         case 0xF0:
@@ -801,6 +1018,8 @@ void nextInstruction() {
 
                 printf("LDH A, (0x%04X)", imm);
                 rb.pc += 2;
+
+                clock += 12;
             }
             break;
         case 0xF3:
@@ -809,6 +1028,8 @@ void nextInstruction() {
 
                 printf("DI");
                 rb.pc++;
+
+                clock += 4;
             }
             break;
         case 0xF6:
@@ -823,6 +1044,8 @@ void nextInstruction() {
 
                 printf("OR 0x%02X", imm);
                 rb.pc += 2;
+
+                clock += 8;
             }
             break;
         case 0xFB:
@@ -831,6 +1054,8 @@ void nextInstruction() {
 
                 printf("EI");
                 rb.pc++;
+
+                clock += 4;
             }
             break;
         case 0xFE:
@@ -845,8 +1070,10 @@ void nextInstruction() {
                 if (temp > 255) rb.f |= 0b00010000;
                 else rb.f &= 0b11101111;
 
-                printf("CP 0x%04X", imm);
+                printf("CP 0x%02X", imm);
                 rb.pc += 2;
+
+                clock += 8;
             }
             break;
         default:
@@ -856,7 +1083,28 @@ void nextInstruction() {
     printf("\n\n");
 }
 
-void reset() {
+void DMGReset() {
+    FILE *rom = fopen("bios.gb", "rb");
+
+    if (!rom) {
+        printf("No BIOS found\n");
+        BIOS = UNMAPPED;
+        rb.pc = 0x100;
+
+        rom = fopen("tetris.gb", "rb");
+        fread(&ram, 0x8000, 1, rom);
+        fclose(rom);
+    }
+    else {
+        printf("Loaded BIOS\n");
+        BIOS = MAPPED;
+        rb.pc = 0x0;
+
+        fread(&ram, 256, 1, rom);
+        fclose(rom);
+    }
+
+    clock = 0;
     IME = false;
 
     rb.f = 0xB0;
@@ -864,7 +1112,6 @@ void reset() {
     rb.de = 0xD8;
     rb.hl = 0x14D;
     rb.sp = 0xFFFE;
-    rb.pc = 0x0;
 
     ram[TIMA] = 0;
     ram[TMA] = 0;
@@ -899,47 +1146,39 @@ void reset() {
     ram[IE] = 0x00;
 }
 
-void runBIOS() {
-    FILE *rom = fopen("bios.gb", "rb");
-
-    if (!rom) {
-        printf("No BIOS found.");
-        rb.pc = 0x100;
-        return;
-    }
-
-    fread(&ram, 256, 1, rom);
-
-    while (rb.pc < 0x100) {
-        nextInstruction();
-
-#ifdef SINGLE_OUTPUT
-        printf("\033[1A");
-        printf("\033[2K");
-        printf("\033[1A");
-        printf("\033[2K");
-        printf("\033[1A");
-        printf("\033[2K");
-        printf("\033[1A");
-        printf("\033[2K");
-        printf("\033[1A");
-        printf("\033[2K");
-        printf("\033[1A");
-        printf("\033[2K");
-        usleep(10);
-#endif
-    }
-}
-
 int main(int argc, char* archv[]) {
-    FILE *rom = fopen("tetris.gb", "rb");
+    SDL_Window *window = NULL;
 
-    reset();
+    if(SDL_Init(SDL_INIT_VIDEO) < 0){
+        printf("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
+        exit(1);
+    }
+    window = SDL_CreateWindow("iron-gb", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 160, 144, SDL_WINDOW_SHOWN /*| SDL_WINDOW_FULLSCREEN*/);
+    if(window == NULL){
+        printf("Window could not be created! SDL_Error: %s\n", SDL_GetError());
+        exit(1);
+    }
 
-    runBIOS();
-    fread(&ram, 0x8000, 1, rom);
+    if (!window) exit(1);
 
-    while (1) {
+    SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+    DMGReset();
+
+    int temp = 0;
+    SDL_Event e;
+    while(1){
+        while(SDL_PollEvent(&e)){
+            if(e.type == SDL_QUIT)
+                exit(0);
+        }
+
+        if (BIOS == MAPPED && rb.pc == 0x100) {
+            BIOS = UNMAPPED;
+            FILE *rom = fopen("tetris.gb", "rb");
+            fread(&ram, 0x8000, 1, rom);
+            fclose(rom);
+        }
+
         nextInstruction();
 
 #ifdef SINGLE_OUTPUT
@@ -957,7 +1196,38 @@ int main(int argc, char* archv[]) {
         printf("\033[2K");
         usleep(10);
 #endif
+
+        ram[LY]++;
+
+        SDL_RenderClear(renderer);
+
+        for (int y = 0; y < 8; y++) {
+            uint8_t low = ram[0x8000 + 2*y];
+            uint8_t high = ram[0x8001 + 2*y];
+
+            for (int x = 0; x < 8; x++) {
+                switch (low >> (7-x) | (high >> (7-x)) << 1) {
+                    case 0:
+                        SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
+                        break;
+                    case 1:
+                        SDL_SetRenderDrawColor(renderer, 192, 192, 192, SDL_ALPHA_OPAQUE);
+                        break;
+                    case 2:
+                        SDL_SetRenderDrawColor(renderer, 96, 96, 96, SDL_ALPHA_OPAQUE);
+                        break;
+                    case 3:
+                        SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
+                        break;
+                }
+                SDL_RenderDrawPoint(renderer, x, y);
+            }
+        }
+
+        SDL_RenderPresent(renderer);
     }
 
+    SDL_DestroyWindow(window);
+    SDL_Quit();
     return 0;
 }

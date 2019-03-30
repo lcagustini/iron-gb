@@ -1,10 +1,10 @@
 multiple_lines:
 	@mkdir -p bin
-	gcc src/main.c -o bin/main
+	gcc src/main.c -o bin/main -lSDL2 -O2
 
 single_line:
 	@mkdir -p bin
-	gcc src/main.c -o bin/main -DSINGLE_OUTPUT
+	gcc src/main.c -o bin/main -lSDL2 -O2 -DSINGLE_OUTPUT
 
 run: multiple_lines
 	./bin/main
