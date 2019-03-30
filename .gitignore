@@ -1,2 +1,5 @@
 bin/
 *.gb
+*.gb.old
+*.sav
+dump
