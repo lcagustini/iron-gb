@@ -238,6 +238,36 @@ void nextInstruction() {
                 time = 8;
             }
             break;
+        case 0x09:
+            {
+                uint16_t prev_hl = rb.hl;
+                uint16_t prev_bc = rb.bc;
+                rb.hl = rb.hl + rb.bc;
+
+                rb.f &= 0b10111111;
+                // TODO: Half carry flag
+                if (rb.hl < prev_hl || rb.hl < prev_bc) rb.f |= 0b00010000;
+
+#ifdef DEBUG
+                printf("ADD HL, BC");
+#endif
+                rb.pc++;
+
+                time = 8;
+            }
+            break;
+        case 0x0A:
+            {
+                rb.a = ram[rb.bc];
+
+#ifdef DEBUG
+                printf("LD A, (BC)");
+#endif
+                rb.pc++;
+
+                time = 8;
+            }
+            break;
         case 0x0B:
             {
                 rb.bc--;
@@ -607,6 +637,23 @@ void nextInstruction() {
                 time = 4;
             }
             break;
+        case 0x2D:
+            {
+                rb.l--;
+
+                if (rb.l == 0) rb.f |= 0b10000000;
+                else rb.f &= 0b01111111;
+                rb.f |= 0b01000000;
+                // TODO: half-carry flag
+
+#ifdef DEBUG
+                printf("DEC L");
+#endif
+                rb.pc++;
+
+                time = 4;
+            }
+            break;
         case 0x2E:
             {
                 uint8_t imm = ram[rb.pc+1];
@@ -709,6 +756,37 @@ void nextInstruction() {
                 time = 12;
             }
             break;
+        case 0x39:
+            {
+                uint16_t prev_hl = rb.hl;
+                uint16_t prev_sp = rb.sp;
+                rb.hl = rb.hl + rb.sp;
+
+                rb.f &= 0b10111111;
+                // TODO: Half carry flag
+                if (rb.hl < prev_hl || rb.hl < prev_sp) rb.f |= 0b00010000;
+
+#ifdef DEBUG
+                printf("ADD HL, SP");
+#endif
+                rb.pc++;
+
+                time = 8;
+            }
+            break;
+        case 0x3A:
+            {
+                rb.a = ram[rb.hl];
+                rb.hl--;
+
+#ifdef DEBUG
+                printf("LDD A, (HL)");
+#endif
+                rb.pc++;
+
+                time = 8;
+            }
+            break;
         case 0x3C:
             {
                 rb.a++;
@@ -757,6 +835,18 @@ void nextInstruction() {
                 time = 8;
             }
             break;
+        case 0x46:
+            {
+                rb.b = ram[rb.hl];
+
+#ifdef DEBUG
+                printf("LD B, (HL)");
+#endif
+                rb.pc++;
+
+                time = 8;
+            }
+            break;
         case 0x47:
             {
                 rb.b = rb.a;
@@ -769,12 +859,36 @@ void nextInstruction() {
                 time = 4;
             }
             break;
+        case 0x4E:
+            {
+                rb.c = ram[rb.hl];
+
+#ifdef DEBUG
+                printf("LD C, (HL)");
+#endif
+                rb.pc++;
+
+                time = 8;
+            }
+            break;
         case 0x4F:
             {
                 rb.c = rb.a;
 
 #ifdef DEBUG
                 printf("LD C, A");
+#endif
+                rb.pc++;
+
+                time = 4;
+            }
+            break;
+        case 0x54:
+            {
+                rb.d = rb.h;
+
+#ifdef DEBUG
+                printf("LD D, H");
 #endif
                 rb.pc++;
 
@@ -805,6 +919,18 @@ void nextInstruction() {
                 time = 4;
             }
             break;
+        case 0x5D:
+            {
+                rb.e = rb.l;
+
+#ifdef DEBUG
+                printf("LD E, L");
+#endif
+                rb.pc++;
+
+                time = 4;
+            }
+            break;
         case 0x5E:
             {
                 rb.e = ram[rb.hl];
@@ -829,6 +955,42 @@ void nextInstruction() {
                 time = 4;
             }
             break;
+        case 0x60:
+            {
+                rb.h = rb.b;
+
+#ifdef DEBUG
+                printf("LD H, B");
+#endif
+                rb.pc++;
+
+                time = 4;
+            }
+            break;
+        case 0x62:
+            {
+                rb.h = rb.d;
+
+#ifdef DEBUG
+                printf("LD H, D");
+#endif
+                rb.pc++;
+
+                time = 4;
+            }
+            break;
+        case 0x65:
+            {
+                rb.h = rb.l;
+
+#ifdef DEBUG
+                printf("LD H, L");
+#endif
+                rb.pc++;
+
+                time = 4;
+            }
+            break;
         case 0x67:
             {
                 rb.h = rb.a;
@@ -839,6 +1001,90 @@ void nextInstruction() {
                 rb.pc++;
 
                 time = 4;
+            }
+            break;
+        case 0x69:
+            {
+                rb.l = rb.c;
+
+#ifdef DEBUG
+                printf("LD L, C");
+#endif
+                rb.pc++;
+
+                time = 4;
+            }
+            break;
+        case 0x6B:
+            {
+                rb.l = rb.e;
+
+#ifdef DEBUG
+                printf("LD L, E");
+#endif
+                rb.pc++;
+
+                time = 4;
+            }
+            break;
+        case 0x6C:
+            {
+                rb.l = rb.h;
+
+#ifdef DEBUG
+                printf("LD L, H");
+#endif
+                rb.pc++;
+
+                time = 4;
+            }
+            break;
+        case 0x6F:
+            {
+                rb.l = rb.a;
+
+#ifdef DEBUG
+                printf("LD L, A");
+#endif
+                rb.pc++;
+
+                time = 4;
+            }
+            break;
+        case 0x71:
+            {
+                writeByte(rb.hl, rb.c);
+
+#ifdef DEBUG
+                printf("LD (HL), C");
+#endif
+                rb.pc++;
+
+                time = 8;
+            }
+            break;
+        case 0x72:
+            {
+                writeByte(rb.hl, rb.d);
+
+#ifdef DEBUG
+                printf("LD (HL), D");
+#endif
+                rb.pc++;
+
+                time = 8;
+            }
+            break;
+        case 0x73:
+            {
+                writeByte(rb.hl, rb.e);
+
+#ifdef DEBUG
+                printf("LD (HL), E");
+#endif
+                rb.pc++;
+
+                time = 8;
             }
             break;
         case 0x77:
@@ -871,6 +1117,18 @@ void nextInstruction() {
 
 #ifdef DEBUG
                 printf("LD A, C");
+#endif
+                rb.pc++;
+
+                time = 4;
+            }
+            break;
+        case 0x7A:
+            {
+                rb.a = rb.d;
+
+#ifdef DEBUG
+                printf("LD A, D");
 #endif
                 rb.pc++;
 
@@ -923,6 +1181,25 @@ void nextInstruction() {
                 rb.pc++;
 
                 time = 8;
+            }
+            break;
+        case 0x85:
+            {
+                uint8_t prev_a = rb.a;
+                rb.a = rb.a + rb.l;
+
+                if (rb.a == 0) rb.f |= 0b10000000;
+                else rb.f &= 0b01111111;
+                rb.f &= 0b10111111;
+                // TODO: Half carry flag
+                if (rb.a < prev_a) rb.f |= 0b00010000;
+
+#ifdef DEBUG
+                printf("ADD A, L");
+#endif
+                rb.pc++;
+
+                time = 4;
             }
             break;
         case 0x86:
@@ -1129,6 +1406,25 @@ void nextInstruction() {
                 time = 12;
             }
             break;
+        case 0xC2:
+            {
+                uint16_t addr = ram[rb.pc+1] | (ram[rb.pc+2] << 8);
+
+                if (!(rb.f & 0b10000000)) {
+                    rb.pc = addr;
+
+                    time = 16;
+                }
+                else {
+                    time = 12;
+                }
+
+#ifdef DEBUG
+                printf("JP NZ, 0x%04X", addr);
+#endif
+                rb.pc += 3;
+            }
+            break;
         case 0xC3:
             {
                 uint16_t addr = ram[rb.pc+1] | (ram[rb.pc+2] << 8);
@@ -1153,6 +1449,27 @@ void nextInstruction() {
                 rb.pc++;
 
                 time = 16;
+            }
+            break;
+        case 0xC6:
+            {
+                uint8_t imm = ram[rb.pc+1];
+
+                uint8_t prev_a = rb.a;
+                rb.a = rb.a + imm;
+
+                if (rb.a == 0) rb.f |= 0b10000000;
+                else rb.f &= 0b01111111;
+                rb.f &= 0b10111111;
+                // TODO: Half carry flag
+                if (rb.a < prev_a) rb.f |= 0b00010000;
+
+#ifdef DEBUG
+                printf("ADD A, %02X", imm);
+#endif
+                rb.pc += 2;
+
+                time = 8;
             }
             break;
         case 0xC8:
@@ -1231,6 +1548,27 @@ void nextInstruction() {
                             time = 8;
                         }
                         break;
+                    case 0x27:
+                        {
+                            bool carry = rb.c & 0b10000000;
+
+                            rb.a <<= 1;
+                            if (carry) rb.f |= 0b00010000;
+                            else rb.f &= 0b11101111;
+
+                            if (rb.a == 0) rb.f |= 0b10000000;
+                            else rb.f &= 0b01111111;
+                            rb.f &= 0b10011111;
+
+#ifdef DEBUG
+                            printf("SLA A");
+#endif
+
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
                     case 0x37:
                         {
                             rb.a = rb.a >> 4 | rb.a << 4;
@@ -1254,6 +1592,31 @@ void nextInstruction() {
                             rb.pc++;
 
                             time = 8;
+                        }
+                        break;
+                    case 0x7F:
+                        {
+                            if (rb.a & 0b10000000) rb.f &= 0b01111111;
+                            else rb.f |= 0b10000000;
+
+#ifdef DEBUG
+                            printf("BIT 7, A");
+#endif
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0x86:
+                        {
+                            writeByte(rb.hl, ram[rb.hl] & ~0b1);
+
+#ifdef DEBUG
+                            printf("RES 0, (HL)");
+#endif
+                            rb.pc++;
+
+                            time = 16;
                         }
                         break;
                     case 0x87:
@@ -1281,9 +1644,7 @@ void nextInstruction() {
                         }
                         break;
                     default:
-#ifdef DEBUG
                         printf("\nUnimplemented extended instruction: CB%02X\n", byte);
-#endif
                         exit(1);
                 }
             }
@@ -1341,6 +1702,21 @@ void nextInstruction() {
 
 #ifdef DEBUG
                 printf("RETI");
+#endif
+
+                time = 16;
+            }
+            break;
+        case 0xDF:
+            {
+                rb.pc++;
+                writeByte(rb.sp -1, (rb.pc & 0xFF00) >> 8);
+                writeByte(rb.sp -2, (rb.pc & 0xFF));
+                rb.pc = 0x18;
+                rb.sp = rb.sp-2;
+
+#ifdef DEBUG
+                printf("RST 0x18");
 #endif
 
                 time = 16;
@@ -1577,6 +1953,21 @@ void nextInstruction() {
                 time = 8;
             }
             break;
+        case 0xFF:
+            {
+                rb.pc++;
+                writeByte(rb.sp -1, (rb.pc & 0xFF00) >> 8);
+                writeByte(rb.sp -2, (rb.pc & 0xFF));
+                rb.pc = 0x38;
+                rb.sp = rb.sp-2;
+
+#ifdef DEBUG
+                printf("RST 0x38");
+#endif
+
+                time = 16;
+            }
+            break;
         default:
             printf("\nUnimplemented instruction: %02X\n", byte);
             exit(1);
@@ -1663,6 +2054,7 @@ void handleInterrupts() {
     //VBlank
     if ((ram[IE] & 0b1) && (ram[IF] & 0b1)) {
         IME = false;
+        ram[IF] &= ~0b1;
 
         writeByte(rb.sp -1, (rb.pc & 0xFF00) >> 8);
         writeByte(rb.sp -2, (rb.pc & 0xFF));
@@ -1708,11 +2100,11 @@ int main(int argc, char* archv[]) {
         if (BIOS == MAPPED && rb.pc == 0x100) {
             BIOS = UNMAPPED;
             FILE *rom = fopen("tetris.gb", "rb");
-            fread(&ram, 0x8000, 1, rom);
+            fread(&ram, 0x100, 1, rom);
             fclose(rom);
         }
 
-        //handleInterrupts();
+        handleInterrupts();
         nextInstruction();
 
 #ifdef SINGLE_OUTPUT
