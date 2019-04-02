@@ -71,12 +71,14 @@ void nextInstruction() {
             break;
         case 0x04:
             {
+                if ((rb.b & 0xF) + 1 > 0xF) rb.f |= 0b00100000;
+                else rb.f &= ~0b00100000;
+
                 rb.b++;
 
                 if (rb.b == 0) rb.f |= 0b10000000;
                 else rb.f &= 0b01111111;
                 rb.f &= 0b10111111;
-                // TODO: half-carry flag
 
                 if (debug) {
                     printf("INC B");
@@ -88,12 +90,14 @@ void nextInstruction() {
             break;
         case 0x05:
             {
+                if ((int)(rb.b & 0xF) - 1 > 0xF) rb.f |= 0b00100000;
+                else rb.f &= ~0b00100000;
+
                 rb.b--;
 
                 if (rb.b == 0) rb.f |= 0b10000000;
                 else rb.f &= 0b01111111;
                 rb.f |= 0b01000000;
-                // TODO: half-carry flag
 
                 if (debug) {
                     printf("DEC B");
@@ -153,15 +157,13 @@ void nextInstruction() {
             break;
         case 0x09:
             {
-                uint16_t prev_hl = rb.hl;
-                uint16_t prev_bc = rb.bc;
-                rb.hl = rb.hl + rb.bc;
-
                 rb.f &= 0b10111111;
-                if ((rb.hl & 0xF) + (rb.bc & 0xF) > 0xF) rb.f |= 0b00100000;
+                if ((rb.hl & 0xFFF) + (rb.bc & 0xFFF) > 0xFFF) rb.f |= 0b00100000;
                 else rb.f &= ~0b00100000;
-                if (rb.hl < prev_hl || rb.hl < prev_bc) rb.f |= 0b00010000;
+                if ((rb.hl & 0xFFFF) + (rb.bc & 0xFFFF) > 0xFFFF) rb.f |= 0b00010000;
                 else rb.f &= ~0b00010000;
+
+                rb.hl = rb.hl + rb.bc;
 
                 if (debug) {
                     printf("ADD HL, BC");
@@ -197,12 +199,14 @@ void nextInstruction() {
             break;
         case 0x0C:
             {
+                if ((rb.c & 0xF) + 1 > 0xF) rb.f |= 0b00100000;
+                else rb.f &= ~0b00100000;
+
                 rb.c++;
 
                 if (rb.c == 0) rb.f |= 0b10000000;
                 else rb.f &= 0b01111111;
                 rb.f &= 0b10111111;
-                // TODO: half-carry flag
 
                 if (debug) {
                     printf("INC C");
@@ -214,12 +218,14 @@ void nextInstruction() {
             break;
         case 0x0D:
             {
+                if ((int)(rb.c & 0xF) - 1 > 0xF) rb.f |= 0b00100000;
+                else rb.f &= ~0b00100000;
+
                 rb.c--;
 
                 if (rb.c == 0) rb.f |= 0b10000000;
                 else rb.f &= 0b01111111;
                 rb.f |= 0b01000000;
-                // TODO: half-carry flag
 
                 if (debug) {
                     printf("DEC C");
@@ -293,12 +299,14 @@ void nextInstruction() {
             break;
         case 0x15:
             {
+                if ((int)(rb.d & 0xF) - 1 > 0xF) rb.f |= 0b00100000;
+                else rb.f &= ~0b00100000;
+
                 rb.d--;
 
                 if (rb.d == 0) rb.f |= 0b10000000;
                 else rb.f &= 0b01111111;
                 rb.f |= 0b01000000;
-                // TODO: half-carry flag
 
                 if (debug) {
                     printf("DEC D");
@@ -360,15 +368,13 @@ void nextInstruction() {
             break;
         case 0x19:
             {
-                uint16_t prev_hl = rb.hl;
-                uint16_t prev_de = rb.de;
-                rb.hl = rb.hl + rb.de;
-
                 rb.f &= 0b10111111;
-                if ((rb.hl & 0xF) + (rb.de & 0xF) > 0xF) rb.f |= 0b00100000;
+                if ((rb.hl & 0xFFF) + (rb.de & 0xFFF) > 0xFFF) rb.f |= 0b00100000;
                 else rb.f &= ~0b00100000;
-                if (rb.hl < prev_hl || rb.hl < prev_de) rb.f |= 0b00010000;
+                if ((rb.hl & 0xFFFF) + (rb.de & 0xFFFF) > 0xFFFF) rb.f |= 0b00010000;
                 else rb.f &= ~0b00010000;
+
+                rb.hl = rb.hl + rb.de;
 
                 if (debug) {
                     printf("ADD HL, DE");
@@ -390,14 +396,28 @@ void nextInstruction() {
                 time = 8;
             }
             break;
+        case 0x1B:
+            {
+                rb.de--;
+
+                if (debug) {
+                    printf("DEC DE");
+                }
+                rb.pc++;
+
+                time = 8;
+            }
+            break;
         case 0x1C:
             {
+                if ((rb.e & 0xF) + 1 > 0xF) rb.f |= 0b00100000;
+                else rb.f &= ~0b00100000;
+
                 rb.e++;
 
                 if (rb.e == 0) rb.f |= 0b10000000;
                 else rb.f &= 0b01111111;
                 rb.f &= 0b10111111;
-                // TODO: half-carry flag
 
                 if (debug) {
                     printf("INC E");
@@ -409,12 +429,14 @@ void nextInstruction() {
             break;
         case 0x1D:
             {
+                if ((int)(rb.e & 0xF) - 1 > 0xF) rb.f |= 0b00100000;
+                else rb.f &= ~0b00100000;
+
                 rb.e--;
 
                 if (rb.e == 0) rb.f |= 0b10000000;
                 else rb.f &= 0b01111111;
                 rb.f |= 0b01000000;
-                // TODO: half-carry flag
 
                 if (debug) {
                     printf("DEC E");
@@ -499,12 +521,14 @@ void nextInstruction() {
             break;
         case 0x24:
             {
+                if ((rb.h & 0xF) + 1 > 0xF) rb.f |= 0b00100000;
+                else rb.f &= ~0b00100000;
+
                 rb.h++;
 
                 if (rb.h == 0) rb.f |= 0b10000000;
                 else rb.f &= 0b01111111;
                 rb.f &= 0b10111111;
-                // TODO: half-carry flag
 
                 if (debug) {
                     printf("INC H");
@@ -516,12 +540,14 @@ void nextInstruction() {
             break;
         case 0x25:
             {
+                if ((int)(rb.h & 0xF) - 1 > 0xF) rb.f |= 0b00100000;
+                else rb.f &= ~0b00100000;
+
                 rb.h--;
 
                 if (rb.h == 0) rb.f |= 0b10000000;
                 else rb.f &= 0b01111111;
                 rb.f |= 0b01000000;
-                // TODO: half-carry flag
 
                 if (debug) {
                     printf("DEC H");
@@ -624,12 +650,14 @@ void nextInstruction() {
             break;
         case 0x2C:
             {
+                if ((rb.l & 0xF) + 1 > 0xF) rb.f |= 0b00100000;
+                else rb.f &= ~0b00100000;
+
                 rb.l++;
 
                 if (rb.l == 0) rb.f |= 0b10000000;
                 else rb.f &= 0b01111111;
                 rb.f &= 0b10111111;
-                // TODO: half-carry flag
 
                 if (debug) {
                     printf("INC L");
@@ -641,12 +669,14 @@ void nextInstruction() {
             break;
         case 0x2D:
             {
+                if ((int)(rb.l & 0xF) - 1 > 0xF) rb.f |= 0b00100000;
+                else rb.f &= ~0b00100000;
+
                 rb.l--;
 
                 if (rb.l == 0) rb.f |= 0b10000000;
                 else rb.f &= 0b01111111;
                 rb.f |= 0b01000000;
-                // TODO: half-carry flag
 
                 if (debug) {
                     printf("DEC L");
@@ -732,12 +762,14 @@ void nextInstruction() {
             break;
         case 0x34:
             {
+                if ((ram[rb.hl] & 0xF) + 1 > 0xF) rb.f |= 0b00100000;
+                else rb.f &= ~0b00100000;
+
                 writeByte(rb.hl, ram[rb.hl] +1);
 
                 if (ram[rb.hl] == 0) rb.f |= 0b10000000;
                 else rb.f &= 0b01111111;
                 rb.f &= 0b10111111;
-                // TODO: half-carry flag
 
                 if (debug) {
                     printf("INC (HL)");
@@ -749,12 +781,14 @@ void nextInstruction() {
             break;
         case 0x35:
             {
+                if ((int)(ram[rb.hl] & 0xF) - 1 > 0xF) rb.f |= 0b00100000;
+                else rb.f &= ~0b00100000;
+
                 writeByte(rb.hl, ram[rb.hl] -1);
 
                 if (ram[rb.hl] == 0) rb.f |= 0b10000000;
                 else rb.f &= 0b01111111;
                 rb.f |= 0b01000000;
-                // TODO: half-carry flag
 
                 if (debug) {
                     printf("DEC (HL)");
@@ -776,6 +810,18 @@ void nextInstruction() {
                 rb.pc += 2;
 
                 time = 12;
+            }
+            break;
+        case 0x37:
+            {
+                rb.f |= 0b00010000;
+
+                if (debug) {
+                    printf("SCF");
+                }
+                rb.pc++;
+
+                time = 4;
             }
             break;
         case 0x38:
@@ -800,15 +846,13 @@ void nextInstruction() {
             break;
         case 0x39:
             {
-                uint16_t prev_hl = rb.hl;
-                uint16_t prev_sp = rb.sp;
-                rb.hl = rb.hl + rb.sp;
-
                 rb.f &= 0b10111111;
-                if ((rb.hl & 0xF) + (rb.sp & 0xF) > 0xF) rb.f |= 0b00100000;
+                if ((rb.hl & 0xFFF) + (rb.sp & 0xFFF) > 0xFFF) rb.f |= 0b00100000;
                 else rb.f &= ~0b00100000;
-                if (rb.hl < prev_hl || rb.hl < prev_sp) rb.f |= 0b00010000;
+                if ((rb.hl & 0xFFFF) + (rb.sp & 0xFFFF) > 0xFFFF) rb.f |= 0b00010000;
                 else rb.f &= ~0b00010000;
+
+                rb.hl = rb.hl + rb.sp;
 
                 if (debug) {
                     printf("ADD HL, SP");
@@ -833,12 +877,14 @@ void nextInstruction() {
             break;
         case 0x3C:
             {
+                if ((rb.a & 0xF) + 1 > 0xF) rb.f |= 0b00100000;
+                else rb.f &= ~0b00100000;
+
                 rb.a++;
 
                 if (rb.a == 0) rb.f |= 0b10000000;
                 else rb.f &= 0b01111111;
                 rb.f &= 0b10111111;
-                // TODO: half-carry flag
 
                 if (debug) {
                     printf("INC A");
@@ -850,12 +896,14 @@ void nextInstruction() {
             break;
         case 0x3D:
             {
+                if ((int)(rb.a & 0xF) - 1 > 0xF) rb.f |= 0b00100000;
+                else rb.f &= ~0b00100000;
+
                 rb.a--;
 
                 if (rb.a == 0) rb.f |= 0b10000000;
                 else rb.f &= 0b01111111;
                 rb.f |= 0b01000000;
-                // TODO: half-carry flag
 
                 if (debug) {
                     printf("DEC A");
@@ -1239,16 +1287,16 @@ void nextInstruction() {
             break;
         case 0x80:
             {
-                uint8_t prev_a = rb.a;
+                if ((rb.a & 0xF) + (rb.b & 0xF) > 0xF) rb.f |= 0b00100000;
+                else rb.f &= ~0b00100000;
+                if ((rb.a & 0xFF) + (rb.b & 0xFF) > 0xFF) rb.f |= 0b00010000;
+                else rb.f &= ~0b00010000;
+
                 rb.a = rb.a + rb.b;
 
                 if (rb.a == 0) rb.f |= 0b10000000;
                 else rb.f &= 0b01111111;
                 rb.f &= 0b10111111;
-                if ((rb.a & 0xF) + (rb.b & 0xF) > 0xF) rb.f |= 0b00100000;
-                else rb.f &= ~0b00100000;
-                if (rb.a < prev_a) rb.f |= 0b00010000;
-                else rb.f &= ~0b00010000;
 
                 if (debug) {
                     printf("ADD A, B");
@@ -1260,16 +1308,16 @@ void nextInstruction() {
             break;
         case 0x82:
             {
-                uint8_t prev_a = rb.a;
+                if ((rb.a & 0xF) + (rb.d & 0xF) > 0xF) rb.f |= 0b00100000;
+                else rb.f &= ~0b00100000;
+                if ((rb.a & 0xFF) + (rb.d & 0xFF) > 0xFF) rb.f |= 0b00010000;
+                else rb.f &= ~0b00010000;
+
                 rb.a = rb.a + rb.d;
 
                 if (rb.a == 0) rb.f |= 0b10000000;
                 else rb.f &= 0b01111111;
                 rb.f &= 0b10111111;
-                if ((rb.a & 0xF) + (rb.d & 0xF) > 0xF) rb.f |= 0b00100000;
-                else rb.f &= ~0b00100000;
-                if (rb.a < prev_a) rb.f |= 0b00010000;
-                else rb.f &= ~0b00010000;
 
                 if (debug) {
                     printf("ADD A, D");
@@ -1281,16 +1329,16 @@ void nextInstruction() {
             break;
         case 0x85:
             {
-                uint8_t prev_a = rb.a;
+                if ((rb.a & 0xF) + (rb.l & 0xF) > 0xF) rb.f |= 0b00100000;
+                else rb.f &= ~0b00100000;
+                if ((rb.a & 0xFF) + (rb.l & 0xFF) > 0xFF) rb.f |= 0b00010000;
+                else rb.f &= ~0b00010000;
+
                 rb.a = rb.a + rb.l;
 
                 if (rb.a == 0) rb.f |= 0b10000000;
                 else rb.f &= 0b01111111;
                 rb.f &= 0b10111111;
-                if ((rb.a & 0xF) + (rb.l & 0xF) > 0xF) rb.f |= 0b00100000;
-                else rb.f &= ~0b00100000;
-                if (rb.a < prev_a) rb.f |= 0b00010000;
-                else rb.f &= ~0b00010000;
 
                 if (debug) {
                     printf("ADD A, L");
@@ -1302,16 +1350,16 @@ void nextInstruction() {
             break;
         case 0x86:
             {
-                uint8_t prev_a = rb.a;
+                if ((rb.a & 0xF) + (ram[rb.hl] & 0xF) > 0xF) rb.f |= 0b00100000;
+                else rb.f &= ~0b00100000;
+                if ((rb.a & 0xFF) + (ram[rb.hl] & 0xFF) > 0xFF) rb.f |= 0b00010000;
+                else rb.f &= ~0b00010000;
+
                 rb.a = rb.a + ram[rb.hl];
 
                 if (rb.a == 0) rb.f |= 0b10000000;
                 else rb.f &= 0b01111111;
                 rb.f &= 0b10111111;
-                if ((rb.a & 0xF) + (ram[rb.hl] & 0xF) > 0xF) rb.f |= 0b00100000;
-                else rb.f &= ~0b00100000;
-                if (rb.a < prev_a) rb.f |= 0b00010000;
-                else rb.f &= ~0b00010000;
 
                 if (debug) {
                     printf("ADD A, (HL)");
@@ -1323,16 +1371,16 @@ void nextInstruction() {
             break;
         case 0x87:
             {
-                uint8_t prev_a = rb.a;
+                if ((rb.a & 0xF) + (rb.a & 0xF) > 0xF) rb.f |= 0b00100000;
+                else rb.f &= ~0b00100000;
+                if ((rb.a & 0xFF) + (rb.a & 0xFF) > 0xFF) rb.f |= 0b00010000;
+                else rb.f &= ~0b00010000;
+
                 rb.a = rb.a + rb.a;
 
                 if (rb.a == 0) rb.f |= 0b10000000;
                 else rb.f &= 0b01111111;
                 rb.f &= 0b10111111;
-                if ((rb.a & 0xF) + (rb.a & 0xF) > 0xF) rb.f |= 0b00100000;
-                else rb.f &= ~0b00100000;
-                if (rb.a < prev_a) rb.f |= 0b00010000;
-                else rb.f &= ~0b00010000;
 
                 if (debug) {
                     printf("ADD A, A");
@@ -1344,16 +1392,16 @@ void nextInstruction() {
             break;
         case 0x89:
             {
-                uint8_t prev_a = rb.a;
+                if ((rb.a & 0xF) + (rb.c & 0xF) + ((rb.f >> 4) & 1) > 0xF) rb.f |= 0b00100000;
+                else rb.f &= ~0b00100000;
+                if ((rb.a & 0xFF) + (rb.c & 0xFF) + ((rb.f >> 4) & 1) > 0xFF) rb.f |= 0b00010000;
+                else rb.f &= ~0b00010000;
+
                 rb.a = rb.a + rb.c + ((rb.f >> 4) & 1);
 
                 if (rb.a == 0) rb.f |= 0b10000000;
                 else rb.f &= 0b01111111;
                 rb.f &= 0b10111111;
-                if ((rb.a & 0xF) + (rb.c & 0xF) > 0xF) rb.f |= 0b00100000;
-                else rb.f &= ~0b00100000;
-                if (rb.a < prev_a) rb.f |= 0b00010000;
-                else rb.f &= ~0b00010000;
 
                 if (debug) {
                     printf("ADC A, C");
@@ -1365,16 +1413,16 @@ void nextInstruction() {
             break;
         case 0x8E:
             {
-                uint8_t prev_a = rb.a;
+                if ((rb.a & 0xF) + (ram[rb.hl] & 0xF) + ((rb.f >> 4) & 1) > 0xF) rb.f |= 0b00100000;
+                else rb.f &= ~0b00100000;
+                if ((rb.a & 0xFF) + (ram[rb.hl] & 0xFF) + ((rb.f >> 4) & 1) > 0xFF) rb.f |= 0b00010000;
+                else rb.f &= ~0b00010000;
+
                 rb.a = rb.a + ram[rb.hl] + ((rb.f >> 4) & 1);
 
                 if (rb.a == 0) rb.f |= 0b10000000;
                 else rb.f &= 0b01111111;
                 rb.f &= 0b10111111;
-                if ((rb.a & 0xF) + (ram[rb.hl] & 0xF) > 0xF) rb.f |= 0b00100000;
-                else rb.f &= ~0b00100000;
-                if (rb.a < prev_a) rb.f |= 0b00010000;
-                else rb.f &= ~0b00010000;
 
                 if (debug) {
                     printf("ADC A, (HL)");
@@ -1386,16 +1434,16 @@ void nextInstruction() {
             break;
         case 0x90:
             {
-                uint16_t prev_a = rb.a;
+                if ((int)(rb.a & 0xF) - (int)(rb.b & 0xF) < 0) rb.f |= 0b00100000;
+                else rb.f &= ~0b00100000;
+                if ((int)(rb.a & 0xFF) - (int)(rb.b & 0xFF) < 0) rb.f |= 0b00010000;
+                else rb.f &= 0b00010000;
+
                 rb.a = rb.a - rb.b;
 
                 if (rb.a == 0) rb.f |= 0b10000000;
                 else rb.f &= 0b01111111;
                 rb.f |= 0b01000000;
-                if ((int)(rb.a & 0xf) - (int)(rb.b & 0xf) < 0) rb.f |= 0b00100000;
-                else rb.f &= ~0b00100000;
-                if (rb.a > prev_a) rb.f |= 0b00010000;
-                else rb.f &= 0b00010000;
 
                 if (debug) {
                     printf("SUB A, B");
@@ -1407,16 +1455,16 @@ void nextInstruction() {
             break;
         case 0x96:
             {
-                uint16_t prev_a = rb.a;
+                if ((int)(rb.a & 0xF) - (int)(ram[rb.hl] & 0xF) < 0) rb.f |= 0b00100000;
+                else rb.f &= ~0b00100000;
+                if ((int)(rb.a & 0xFF) - (int)(ram[rb.hl] & 0xFF) < 0) rb.f |= 0b00010000;
+                else rb.f &= 0b00010000;
+
                 rb.a = rb.a - ram[rb.hl];
 
                 if (rb.a == 0) rb.f |= 0b10000000;
                 else rb.f &= 0b01111111;
                 rb.f |= 0b01000000;
-                if ((int)(rb.a & 0xf) - (int)(ram[rb.hl] & 0xf) < 0) rb.f |= 0b00100000;
-                else rb.f &= ~0b00100000;
-                if (rb.a > prev_a) rb.f |= 0b00010000;
-                else rb.f &= 0b00010000;
 
                 if (debug) {
                     printf("SUB A, (HL)");
@@ -1424,6 +1472,27 @@ void nextInstruction() {
                 rb.pc++;
 
                 time = 8;
+            }
+            break;
+        case 0x99:
+            {
+                if ((int)(rb.a & 0xF) - (int)(rb.c & 0xF) - (int)((rb.f >> 4) & 1) > 0xF) rb.f |= 0b00100000;
+                else rb.f &= ~0b00100000;
+                if ((int)(rb.a & 0xFF) - (int)(rb.c & 0xFF) - (int)((rb.f >> 4) & 1) > 0xFF) rb.f |= 0b00010000;
+                else rb.f &= ~0b00010000;
+
+                rb.a = rb.a - rb.c - ((rb.f >> 4) & 1);
+
+                if (rb.a == 0) rb.f |= 0b10000000;
+                else rb.f &= 0b01111111;
+                rb.f |= 0b01000000;
+
+                if (debug) {
+                    printf("SBC A, C");
+                }
+                rb.pc++;
+
+                time = 4;
             }
             break;
         case 0xA0:
@@ -1593,9 +1662,9 @@ void nextInstruction() {
                 if (temp == 0) rb.f |= 0b10000000;
                 else rb.f &= 0b01111111;
                 rb.f |= 0b01000000;
-                if ((int)(rb.a & 0xf) - (int)(rb.b & 0xf) < 0) rb.f |= 0b00100000;
+                if ((int)(rb.a & 0xF) - (int)(rb.b & 0xF) < 0) rb.f |= 0b00100000;
                 else rb.f &= ~0b00100000;
-                if (temp > 255) rb.f |= 0b00010000;
+                if ((int)(rb.a & 0xFF) - (int)(rb.b & 0xFF) < 0) rb.f |= 0b00010000;
                 else rb.f &= 0b11101111;
 
                 if (debug) {
@@ -1612,9 +1681,9 @@ void nextInstruction() {
                 if (temp == 0) rb.f |= 0b10000000;
                 else rb.f &= 0b01111111;
                 rb.f |= 0b01000000;
-                if ((int)(rb.a & 0xf) - (int)(rb.c & 0xf) < 0) rb.f |= 0b00100000;
+                if ((int)(rb.a & 0xF) - (int)(rb.c & 0xF) < 0) rb.f |= 0b00100000;
                 else rb.f &= ~0b00100000;
-                if (temp > 255) rb.f |= 0b00010000;
+                if ((int)(rb.a & 0xFF) - (int)(rb.c & 0xFF) < 0) rb.f |= 0b00010000;
                 else rb.f &= 0b11101111;
 
                 if (debug) {
@@ -1631,9 +1700,9 @@ void nextInstruction() {
                 if (temp == 0) rb.f |= 0b10000000;
                 else rb.f &= 0b01111111;
                 rb.f |= 0b01000000;
-                if ((int)(rb.a & 0xf) - (int)(ram[rb.hl] & 0xf) < 0) rb.f |= 0b00100000;
+                if ((int)(rb.a & 0xF) - (int)(ram[rb.hl] & 0xF) < 0) rb.f |= 0b00100000;
                 else rb.f &= ~0b00100000;
-                if (temp > 255) rb.f |= 0b00010000;
+                if ((int)(rb.a & 0xFF) - (int)(ram[rb.hl] & 0xFF) < 0) rb.f |= 0b00010000;
                 else rb.f &= 0b11101111;
 
                 if (debug) {
@@ -1725,17 +1794,16 @@ void nextInstruction() {
         case 0xC6:
             {
                 uint8_t imm = ram[rb.pc+1];
+                if ((rb.a & 0xF) + (imm & 0xF) > 0xF) rb.f |= 0b00100000;
+                else rb.f &= ~0b00100000;
+                if ((rb.a & 0xFF) + (imm & 0xFF) > 0xFF) rb.f |= 0b00010000;
+                else rb.f &= ~0b00010000;
 
-                uint8_t prev_a = rb.a;
                 rb.a = rb.a + imm;
 
                 if (rb.a == 0) rb.f |= 0b10000000;
                 else rb.f &= 0b01111111;
                 rb.f &= 0b10111111;
-                if ((rb.a & 0xF) + (imm & 0xF) > 0xF) rb.f |= 0b00100000;
-                else rb.f &= ~0b00100000;
-                if (rb.a < prev_a) rb.f |= 0b00010000;
-                else rb.f &= ~0b00010000;
 
                 if (debug) {
                     printf("ADD A, %02X", imm);
@@ -2292,17 +2360,16 @@ void nextInstruction() {
         case 0xD6:
             {
                 uint8_t imm = ram[rb.pc+1];
+                if ((int)(rb.a & 0xF) - (int)(imm & 0xF) < 0) rb.f |= 0b00100000;
+                else rb.f &= ~0b00100000;
+                if ((int)(rb.a & 0xFF) - (int)(imm & 0xFF) < 0) rb.f |= 0b00010000;
+                else rb.f &= 0b00010000;
 
-                uint16_t prev_a = rb.a;
                 rb.a = rb.a - imm;
 
                 if (rb.a == 0) rb.f |= 0b10000000;
                 else rb.f &= 0b01111111;
                 rb.f |= 0b01000000;
-                if ((int)(rb.a & 0xf) - (int)(imm & 0xf) < 0) rb.f |= 0b00100000;
-                else rb.f &= ~0b00100000;
-                if (rb.a > prev_a) rb.f |= 0b00010000;
-                else rb.f &= 0b00010000;
 
                 if (debug) {
                     printf("SUB A, %02X", imm);
@@ -2577,9 +2644,9 @@ void nextInstruction() {
                 if (temp == 0) rb.f |= 0b10000000;
                 else rb.f &= 0b01111111;
                 rb.f |= 0b01000000;
-                if ((int)(rb.a & 0xf) - (int)(imm & 0xf) < 0) rb.f |= 0b00100000;
+                if ((int)(rb.a & 0xF) - (int)(imm & 0xF) < 0) rb.f |= 0b00100000;
                 else rb.f &= ~0b00100000;
-                if (temp > 255) rb.f |= 0b00010000;
+                if ((int)(rb.a & 0xFF) - (int)(imm & 0xFF) < 0) rb.f |= 0b00010000;
                 else rb.f &= 0b11101111;
 
                 if (debug) {

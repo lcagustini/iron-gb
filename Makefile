@@ -1,23 +1,13 @@
-multiple_lines:
-	@mkdir -p bin
-	gcc src/main.c -o bin/main -lSDL2 -O3 -DDEBUG -g
-
-single_line:
-	@mkdir -p bin
-	gcc src/main.c -o bin/main -lSDL2 -O3 -DSINGLE_OUTPUT -DDEBUG -g
-
-no_lines:
+all:
 	@mkdir -p bin
 	gcc src/main.c -o bin/main -lSDL2 -O3
 
-run: no_lines
-	./bin/main
+debug:
+	@mkdir -p bin
+	gcc src/main.c -o bin/main -lSDL2 -Og -ggdb -g3 -fno-omit-frame-pointer
 
-run_multiple: multiple_lines
-	./bin/main
-
-run_single: single_line
-	./bin/main
+run: all
+	./bin/main tetris.gb
 
 clean:
 	rm -rf bin

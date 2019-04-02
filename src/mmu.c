@@ -72,7 +72,7 @@ void getInput() {
 }
 
 void updateRegisters() {
-    ram[DIV] += rand() % 5;
+    ram[DIV] += cpu_clock % 293339;
 
     if (ram[LYC] == ram[LY]) {
         ram[STAT] |= 0b100;

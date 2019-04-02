@@ -1,8 +1,5 @@
 #include <SDL2/SDL.h>
 
-#include <unistd.h>
-#include <time.h>
-
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -115,10 +112,8 @@ bool debug = false;
 #include "mmu.c"
 #include "cpu.c"
 
-void DMGReset() {
-    FILE *rom = fopen("tetris.gb", "rb");
+void DMGReset(FILE *rom) {
     fread(&ram, 0x8000, 1, rom);
-    fclose(rom);
 
     FILE *bios = fopen("bios.gb", "rb");
     if (!bios) {
@@ -181,7 +176,7 @@ void DMGReset() {
     ram[IE] = 0x00;
 }
 
-int main(int argc, char* archv[]) {
+int main(int argc, char* argv[]) {
     SDL_Window *window = NULL;
 
     if(SDL_Init(SDL_INIT_VIDEO) < 0){
@@ -196,13 +191,13 @@ int main(int argc, char* archv[]) {
 
     if (!window) exit(1);
 
-    srand(time(NULL));
-
     SDL_Surface *screen_surface = SDL_GetWindowSurface(window);
     SDL_Surface *draw_surface = SDL_CreateRGBSurface(0, 160, 144, screen_surface->format->BitsPerPixel,
                                                      screen_surface->format->Rmask, screen_surface->format->Gmask,
                                                      screen_surface->format->Bmask, screen_surface->format->Amask);
-    DMGReset();
+
+    FILE *rom = fopen(argv[1], "rb");
+    DMGReset(rom);
 
     SDL_Event e;
     while(1){
@@ -213,9 +208,7 @@ int main(int argc, char* archv[]) {
 
         if (BIOS == MAPPED && rb.pc == 0x100) {
             BIOS = UNMAPPED;
-            FILE *rom = fopen("tetris.gb", "rb");
             fread(&ram, 0x100, 1, rom);
-            fclose(rom);
         }
 
         getInput();
@@ -230,23 +223,6 @@ int main(int argc, char* archv[]) {
             char c = getchar();
             if (c == 'c') debug = false;
         }
-
-#ifdef SINGLE_OUTPUT
-        if (debug) {
-            printf("\033[1A");
-            printf("\033[2K");
-            printf("\033[1A");
-            printf("\033[2K");
-            printf("\033[1A");
-            printf("\033[2K");
-            printf("\033[1A");
-            printf("\033[2K");
-            printf("\033[1A");
-            printf("\033[2K");
-            printf("\033[1A");
-            printf("\033[2K");
-        }
-#endif
 
         int mode = ram[STAT] & 0b11;
         switch (mode) {
@@ -268,8 +244,8 @@ int main(int argc, char* archv[]) {
 
                     // Render a line
                     uint8_t y = ram[LY];
-                    for (int x = 0; x < 160; x++) {
-                        if (ram[LCDC] & 0b1) {
+                    if (ram[LCDC] & 0b1) {
+                        for (int x = 0; x < 160; x++) {
                             uint8_t sx = x + ram[SCX];
                             uint8_t sy = y + ram[SCY];
 
@@ -335,6 +311,7 @@ int main(int argc, char* archv[]) {
         }
     }
 
+    fclose(rom);
     SDL_DestroyWindow(window);
     SDL_Quit();
     return 0;
