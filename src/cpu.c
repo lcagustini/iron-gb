@@ -19,6 +19,7 @@ void nextInstruction() {
     uint8_t time = 0;
     uint8_t byte = ram[rb.pc];
     switch (byte) {
+        case 0xF2:
         case 0x00:
             {
                 if (debug) {
@@ -121,7 +122,7 @@ void nextInstruction() {
             break;
         case 0x07:
             {
-                bool carry = rb.c & 0b10000000;
+                bool carry = rb.a & 0b10000000;
 
                 rb.a <<= 1;
                 rb.a |= (carry >> 7);
@@ -1917,12 +1918,14 @@ void nextInstruction() {
             break;
         case 0x88:
             {
-                if ((rb.a & 0xF) + (rb.b & 0xF) + ((rb.f >> 4) & 1) > 0xF) rb.f |= 0b00100000;
+                uint8_t carry = ((rb.f >> 4) & 1);
+
+                if ((rb.a & 0xF) + (rb.b & 0xF) + carry > 0xF) rb.f |= 0b00100000;
                 else rb.f &= ~0b00100000;
-                if ((rb.a & 0xFF) + (rb.b & 0xFF) + ((rb.f >> 4) & 1) > 0xFF) rb.f |= 0b00010000;
+                if ((rb.a & 0xFF) + (rb.b & 0xFF) + carry > 0xFF) rb.f |= 0b00010000;
                 else rb.f &= ~0b00010000;
 
-                rb.a = rb.a + rb.b + ((rb.f >> 4) & 1);
+                rb.a = rb.a + rb.b + carry;
 
                 if (rb.a == 0) rb.f |= 0b10000000;
                 else rb.f &= 0b01111111;
@@ -1938,12 +1941,14 @@ void nextInstruction() {
             break;
         case 0x89:
             {
-                if ((rb.a & 0xF) + (rb.c & 0xF) + ((rb.f >> 4) & 1) > 0xF) rb.f |= 0b00100000;
+                uint8_t carry = ((rb.f >> 4) & 1);
+
+                if ((rb.a & 0xF) + (rb.c & 0xF) + carry > 0xF) rb.f |= 0b00100000;
                 else rb.f &= ~0b00100000;
-                if ((rb.a & 0xFF) + (rb.c & 0xFF) + ((rb.f >> 4) & 1) > 0xFF) rb.f |= 0b00010000;
+                if ((rb.a & 0xFF) + (rb.c & 0xFF) + carry > 0xFF) rb.f |= 0b00010000;
                 else rb.f &= ~0b00010000;
 
-                rb.a = rb.a + rb.c + ((rb.f >> 4) & 1);
+                rb.a = rb.a + rb.c + carry;
 
                 if (rb.a == 0) rb.f |= 0b10000000;
                 else rb.f &= 0b01111111;
@@ -1959,12 +1964,14 @@ void nextInstruction() {
             break;
         case 0x8A:
             {
-                if ((rb.a & 0xF) + (rb.d & 0xF) + ((rb.f >> 4) & 1) > 0xF) rb.f |= 0b00100000;
+                uint8_t carry = ((rb.f >> 4) & 1);
+
+                if ((rb.a & 0xF) + (rb.d & 0xF) + carry > 0xF) rb.f |= 0b00100000;
                 else rb.f &= ~0b00100000;
-                if ((rb.a & 0xFF) + (rb.d & 0xFF) + ((rb.f >> 4) & 1) > 0xFF) rb.f |= 0b00010000;
+                if ((rb.a & 0xFF) + (rb.d & 0xFF) + carry > 0xFF) rb.f |= 0b00010000;
                 else rb.f &= ~0b00010000;
 
-                rb.a = rb.a + rb.d + ((rb.f >> 4) & 1);
+                rb.a = rb.a + rb.d + carry;
 
                 if (rb.a == 0) rb.f |= 0b10000000;
                 else rb.f &= 0b01111111;
@@ -1980,12 +1987,14 @@ void nextInstruction() {
             break;
         case 0x8B:
             {
-                if ((rb.a & 0xF) + (rb.e & 0xF) + ((rb.f >> 4) & 1) > 0xF) rb.f |= 0b00100000;
+                uint8_t carry = ((rb.f >> 4) & 1);
+
+                if ((rb.a & 0xF) + (rb.e & 0xF) + carry > 0xF) rb.f |= 0b00100000;
                 else rb.f &= ~0b00100000;
-                if ((rb.a & 0xFF) + (rb.e & 0xFF) + ((rb.f >> 4) & 1) > 0xFF) rb.f |= 0b00010000;
+                if ((rb.a & 0xFF) + (rb.e & 0xFF) + carry > 0xFF) rb.f |= 0b00010000;
                 else rb.f &= ~0b00010000;
 
-                rb.a = rb.a + rb.e + ((rb.f >> 4) & 1);
+                rb.a = rb.a + rb.e + carry;
 
                 if (rb.a == 0) rb.f |= 0b10000000;
                 else rb.f &= 0b01111111;
@@ -2001,12 +2010,14 @@ void nextInstruction() {
             break;
         case 0x8C:
             {
-                if ((rb.a & 0xF) + (rb.h & 0xF) + ((rb.f >> 4) & 1) > 0xF) rb.f |= 0b00100000;
+                uint8_t carry = ((rb.f >> 4) & 1);
+
+                if ((rb.a & 0xF) + (rb.h & 0xF) + carry > 0xF) rb.f |= 0b00100000;
                 else rb.f &= ~0b00100000;
-                if ((rb.a & 0xFF) + (rb.h & 0xFF) + ((rb.f >> 4) & 1) > 0xFF) rb.f |= 0b00010000;
+                if ((rb.a & 0xFF) + (rb.h & 0xFF) + carry > 0xFF) rb.f |= 0b00010000;
                 else rb.f &= ~0b00010000;
 
-                rb.a = rb.a + rb.h + ((rb.f >> 4) & 1);
+                rb.a = rb.a + rb.h + carry;
 
                 if (rb.a == 0) rb.f |= 0b10000000;
                 else rb.f &= 0b01111111;
@@ -2022,12 +2033,14 @@ void nextInstruction() {
             break;
         case 0x8D:
             {
-                if ((rb.a & 0xF) + (rb.l & 0xF) + ((rb.f >> 4) & 1) > 0xF) rb.f |= 0b00100000;
+                uint8_t carry = ((rb.f >> 4) & 1);
+
+                if ((rb.a & 0xF) + (rb.l & 0xF) + carry > 0xF) rb.f |= 0b00100000;
                 else rb.f &= ~0b00100000;
-                if ((rb.a & 0xFF) + (rb.l & 0xFF) + ((rb.f >> 4) & 1) > 0xFF) rb.f |= 0b00010000;
+                if ((rb.a & 0xFF) + (rb.l & 0xFF) + carry > 0xFF) rb.f |= 0b00010000;
                 else rb.f &= ~0b00010000;
 
-                rb.a = rb.a + rb.l + ((rb.f >> 4) & 1);
+                rb.a = rb.a + rb.l + carry;
 
                 if (rb.a == 0) rb.f |= 0b10000000;
                 else rb.f &= 0b01111111;
@@ -2043,12 +2056,14 @@ void nextInstruction() {
             break;
         case 0x8E:
             {
-                if ((rb.a & 0xF) + (ram[rb.hl] & 0xF) + ((rb.f >> 4) & 1) > 0xF) rb.f |= 0b00100000;
+                uint8_t carry = ((rb.f >> 4) & 1);
+
+                if ((rb.a & 0xF) + (ram[rb.hl] & 0xF) + carry > 0xF) rb.f |= 0b00100000;
                 else rb.f &= ~0b00100000;
-                if ((rb.a & 0xFF) + (ram[rb.hl] & 0xFF) + ((rb.f >> 4) & 1) > 0xFF) rb.f |= 0b00010000;
+                if ((rb.a & 0xFF) + (ram[rb.hl] & 0xFF) + carry > 0xFF) rb.f |= 0b00010000;
                 else rb.f &= ~0b00010000;
 
-                rb.a = rb.a + ram[rb.hl] + ((rb.f >> 4) & 1);
+                rb.a = rb.a + ram[rb.hl] + carry;
 
                 if (rb.a == 0) rb.f |= 0b10000000;
                 else rb.f &= 0b01111111;
@@ -2064,12 +2079,14 @@ void nextInstruction() {
             break;
         case 0x8F:
             {
-                if ((rb.a & 0xF) + (rb.a & 0xF) + ((rb.f >> 4) & 1) > 0xF) rb.f |= 0b00100000;
+                uint8_t carry = ((rb.f >> 4) & 1);
+
+                if ((rb.a & 0xF) + (rb.a & 0xF) + carry > 0xF) rb.f |= 0b00100000;
                 else rb.f &= ~0b00100000;
-                if ((rb.a & 0xFF) + (rb.a & 0xFF) + ((rb.f >> 4) & 1) > 0xFF) rb.f |= 0b00010000;
+                if ((rb.a & 0xFF) + (rb.a & 0xFF) + carry > 0xFF) rb.f |= 0b00010000;
                 else rb.f &= ~0b00010000;
 
-                rb.a = rb.a + rb.a + ((rb.f >> 4) & 1);
+                rb.a = rb.a + rb.a + carry;
 
                 if (rb.a == 0) rb.f |= 0b10000000;
                 else rb.f &= 0b01111111;
@@ -2253,12 +2270,14 @@ void nextInstruction() {
             break;
         case 0x98:
             {
-                if ((int)(rb.a & 0xF) - (int)(rb.b & 0xF) - (int)((rb.f >> 4) & 1) > 0xF) rb.f |= 0b00100000;
+                uint8_t carry = ((rb.f >> 4) & 1);
+
+                if ((int)(rb.a & 0xF) - (int)(rb.b & 0xF) - (int)carry > 0xF) rb.f |= 0b00100000;
                 else rb.f &= ~0b00100000;
-                if ((int)(rb.a & 0xFF) - (int)(rb.b & 0xFF) - (int)((rb.f >> 4) & 1) > 0xFF) rb.f |= 0b00010000;
+                if ((int)(rb.a & 0xFF) - (int)(rb.b & 0xFF) - (int)carry > 0xFF) rb.f |= 0b00010000;
                 else rb.f &= ~0b00010000;
 
-                rb.a = rb.a - rb.b - ((rb.f >> 4) & 1);
+                rb.a = rb.a - rb.b - carry;
 
                 if (rb.a == 0) rb.f |= 0b10000000;
                 else rb.f &= 0b01111111;
@@ -2274,12 +2293,14 @@ void nextInstruction() {
             break;
         case 0x99:
             {
-                if ((int)(rb.a & 0xF) - (int)(rb.c & 0xF) - (int)((rb.f >> 4) & 1) > 0xF) rb.f |= 0b00100000;
+                uint8_t carry = ((rb.f >> 4) & 1);
+
+                if ((int)(rb.a & 0xF) - (int)(rb.c & 0xF) - (int)carry > 0xF) rb.f |= 0b00100000;
                 else rb.f &= ~0b00100000;
-                if ((int)(rb.a & 0xFF) - (int)(rb.c & 0xFF) - (int)((rb.f >> 4) & 1) > 0xFF) rb.f |= 0b00010000;
+                if ((int)(rb.a & 0xFF) - (int)(rb.c & 0xFF) - (int)carry > 0xFF) rb.f |= 0b00010000;
                 else rb.f &= ~0b00010000;
 
-                rb.a = rb.a - rb.c - ((rb.f >> 4) & 1);
+                rb.a = rb.a - rb.c - carry;
 
                 if (rb.a == 0) rb.f |= 0b10000000;
                 else rb.f &= 0b01111111;
@@ -2295,12 +2316,14 @@ void nextInstruction() {
             break;
         case 0x9A:
             {
-                if ((int)(rb.a & 0xF) - (int)(rb.d & 0xF) - (int)((rb.f >> 4) & 1) > 0xF) rb.f |= 0b00100000;
+                uint8_t carry = ((rb.f >> 4) & 1);
+
+                if ((int)(rb.a & 0xF) - (int)(rb.d & 0xF) - (int)carry > 0xF) rb.f |= 0b00100000;
                 else rb.f &= ~0b00100000;
-                if ((int)(rb.a & 0xFF) - (int)(rb.d & 0xFF) - (int)((rb.f >> 4) & 1) > 0xFF) rb.f |= 0b00010000;
+                if ((int)(rb.a & 0xFF) - (int)(rb.d & 0xFF) - (int)carry > 0xFF) rb.f |= 0b00010000;
                 else rb.f &= ~0b00010000;
 
-                rb.a = rb.a - rb.d - ((rb.f >> 4) & 1);
+                rb.a = rb.a - rb.d - carry;
 
                 if (rb.a == 0) rb.f |= 0b10000000;
                 else rb.f &= 0b01111111;
@@ -2316,12 +2339,14 @@ void nextInstruction() {
             break;
         case 0x9B:
             {
-                if ((int)(rb.a & 0xF) - (int)(rb.e & 0xF) - (int)((rb.f >> 4) & 1) > 0xF) rb.f |= 0b00100000;
+                uint8_t carry = ((rb.f >> 4) & 1);
+
+                if ((int)(rb.a & 0xF) - (int)(rb.e & 0xF) - (int)carry > 0xF) rb.f |= 0b00100000;
                 else rb.f &= ~0b00100000;
-                if ((int)(rb.a & 0xFF) - (int)(rb.e & 0xFF) - (int)((rb.f >> 4) & 1) > 0xFF) rb.f |= 0b00010000;
+                if ((int)(rb.a & 0xFF) - (int)(rb.e & 0xFF) - (int)carry > 0xFF) rb.f |= 0b00010000;
                 else rb.f &= ~0b00010000;
 
-                rb.a = rb.a - rb.e - ((rb.f >> 4) & 1);
+                rb.a = rb.a - rb.e - carry;
 
                 if (rb.a == 0) rb.f |= 0b10000000;
                 else rb.f &= 0b01111111;
@@ -2337,12 +2362,14 @@ void nextInstruction() {
             break;
         case 0x9C:
             {
-                if ((int)(rb.a & 0xF) - (int)(rb.h & 0xF) - (int)((rb.f >> 4) & 1) > 0xF) rb.f |= 0b00100000;
+                uint8_t carry = ((rb.f >> 4) & 1);
+
+                if ((int)(rb.a & 0xF) - (int)(rb.h & 0xF) - (int)carry > 0xF) rb.f |= 0b00100000;
                 else rb.f &= ~0b00100000;
-                if ((int)(rb.a & 0xFF) - (int)(rb.h & 0xFF) - (int)((rb.f >> 4) & 1) > 0xFF) rb.f |= 0b00010000;
+                if ((int)(rb.a & 0xFF) - (int)(rb.h & 0xFF) - (int)carry > 0xFF) rb.f |= 0b00010000;
                 else rb.f &= ~0b00010000;
 
-                rb.a = rb.a - rb.h - ((rb.f >> 4) & 1);
+                rb.a = rb.a - rb.h - carry;
 
                 if (rb.a == 0) rb.f |= 0b10000000;
                 else rb.f &= 0b01111111;
@@ -2358,12 +2385,14 @@ void nextInstruction() {
             break;
         case 0x9D:
             {
-                if ((int)(rb.a & 0xF) - (int)(rb.l & 0xF) - (int)((rb.f >> 4) & 1) > 0xF) rb.f |= 0b00100000;
+                uint8_t carry = ((rb.f >> 4) & 1);
+
+                if ((int)(rb.a & 0xF) - (int)(rb.l & 0xF) - (int)carry > 0xF) rb.f |= 0b00100000;
                 else rb.f &= ~0b00100000;
-                if ((int)(rb.a & 0xFF) - (int)(rb.l & 0xFF) - (int)((rb.f >> 4) & 1) > 0xFF) rb.f |= 0b00010000;
+                if ((int)(rb.a & 0xFF) - (int)(rb.l & 0xFF) - (int)carry > 0xFF) rb.f |= 0b00010000;
                 else rb.f &= ~0b00010000;
 
-                rb.a = rb.a - rb.l - ((rb.f >> 4) & 1);
+                rb.a = rb.a - rb.l - carry;
 
                 if (rb.a == 0) rb.f |= 0b10000000;
                 else rb.f &= 0b01111111;
@@ -2379,12 +2408,14 @@ void nextInstruction() {
             break;
         case 0x9F:
             {
-                if ((int)(rb.a & 0xF) - (int)(rb.a & 0xF) - (int)((rb.f >> 4) & 1) > 0xF) rb.f |= 0b00100000;
+                uint8_t carry = ((rb.f >> 4) & 1);
+
+                if ((int)(rb.a & 0xF) - (int)(rb.a & 0xF) - (int)carry > 0xF) rb.f |= 0b00100000;
                 else rb.f &= ~0b00100000;
-                if ((int)(rb.a & 0xFF) - (int)(rb.a & 0xFF) - (int)((rb.f >> 4) & 1) > 0xFF) rb.f |= 0b00010000;
+                if ((int)(rb.a & 0xFF) - (int)(rb.a & 0xFF) - (int)carry > 0xFF) rb.f |= 0b00010000;
                 else rb.f &= ~0b00010000;
 
-                rb.a = rb.a - rb.a - ((rb.f >> 4) & 1);
+                rb.a = rb.a - rb.a - carry;
 
                 if (rb.a == 0) rb.f |= 0b10000000;
                 else rb.f &= 0b01111111;
@@ -3101,6 +3132,28 @@ void nextInstruction() {
                 rb.pc++;
                 uint8_t byte = ram[rb.pc];
                 switch (byte) {
+                    case 0x01:
+                        {
+                            bool carry = rb.c & 0b10000000;
+
+                            rb.c <<= 1;
+                            rb.c |= (carry >> 7);
+
+                            if (carry) rb.f |= 0b00010000;
+                            else rb.f &= 0b11101111;
+                            if (rb.c == 0) rb.f |= 0b10000000;
+                            else rb.f &= 0b01111111;
+                            rb.f &= 0b10011111;
+
+                            if (debug) {
+                                printf("RLC C");
+                            }
+
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
                     case 0x11:
                         {
                             bool carry = rb.c & 0b10000000;
@@ -3629,20 +3682,21 @@ void nextInstruction() {
         case 0xCE:
             {
                 uint8_t imm = ram[rb.pc+1];
+                uint8_t carry = ((rb.f >> 4) & 1);
 
-                if ((rb.a & 0xF) + (imm & 0xF) + ((rb.f >> 4) & 1) > 0xF) rb.f |= 0b00100000;
+                if ((rb.a & 0xF) + (imm & 0xF) + carry > 0xF) rb.f |= 0b00100000;
                 else rb.f &= ~0b00100000;
-                if ((rb.a & 0xFF) + (imm & 0xFF) + ((rb.f >> 4) & 1) > 0xFF) rb.f |= 0b00010000;
+                if ((rb.a & 0xFF) + (imm & 0xFF) + carry > 0xFF) rb.f |= 0b00010000;
                 else rb.f &= ~0b00010000;
 
-                rb.a = rb.a + imm + ((rb.f >> 4) & 1);
+                rb.a = rb.a + imm + carry;
 
                 if (rb.a == 0) rb.f |= 0b10000000;
                 else rb.f &= 0b01111111;
                 rb.f &= 0b10111111;
 
                 if (debug) {
-                    printf("ADC A, %02X", imm);
+                    printf("ADC A, 0x%02X", imm);
                 }
                 rb.pc += 2;
 
@@ -3750,6 +3804,30 @@ void nextInstruction() {
                 time = 16;
             }
             break;
+        case 0xDE:
+            {
+                uint8_t imm = ram[rb.pc+1];
+                uint8_t carry = ((rb.f >> 4) & 1);
+
+                if ((int)(rb.a & 0xF) - (int)(imm & 0xF) - (int)carry > 0xF) rb.f |= 0b00100000;
+                else rb.f &= ~0b00100000;
+                if ((int)(rb.a & 0xFF) - (int)(imm & 0xFF) - (int)carry > 0xFF) rb.f |= 0b00010000;
+                else rb.f &= ~0b00010000;
+
+                rb.a = rb.a - imm - carry;
+
+                if (rb.a == 0) rb.f |= 0b10000000;
+                else rb.f &= 0b01111111;
+                rb.f |= 0b01000000;
+
+                if (debug) {
+                    printf("SBC A, %02X", imm);
+                }
+                rb.pc += 2;
+
+                time = 8;
+            }
+            break;
         case 0xDF:
             {
                 rb.pc++;
@@ -3837,6 +3915,28 @@ void nextInstruction() {
                 rb.pc += 2;
 
                 time = 8;
+            }
+            break;
+        case 0xE8:
+            {
+                int8_t imm = ram[rb.pc+1];
+                if ((rb.a & 0xF) + (imm & 0xF) > 0xF) rb.f |= 0b00100000;
+                else rb.f &= ~0b00100000;
+                if ((rb.a & 0xFF) + (imm & 0xFF) > 0xFF) rb.f |= 0b00010000;
+                else rb.f &= ~0b00010000;
+
+                rb.a = rb.a + imm;
+
+                if (rb.a == 0) rb.f |= 0b10000000;
+                else rb.f &= 0b01111111;
+                rb.f &= 0b10111111;
+
+                if (debug) {
+                    printf("ADD SP, 0x%02X", imm);
+                }
+                rb.pc += 2;
+
+                time = 16;
             }
             break;
         case 0xE9:

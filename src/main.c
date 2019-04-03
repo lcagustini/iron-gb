@@ -208,6 +208,7 @@ int main(int argc, char* argv[]) {
 
         if (BIOS == MAPPED && rb.pc == 0x100) {
             BIOS = UNMAPPED;
+            rewind(rom);
             fread(&ram, 0x100, 1, rom);
         }
 

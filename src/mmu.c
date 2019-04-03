@@ -35,6 +35,18 @@ void handleInterrupts() {
         time = 20;
     }
 
+    if ((ram[IE] & 0b100) && (ram[IF] & 0b100)) {
+        IME = false;
+        ram[IF] &= ~0b100;
+
+        writeByte(rb.sp -1, (rb.pc & 0xFF00) >> 8);
+        writeByte(rb.sp -2, (rb.pc & 0xFF));
+        rb.pc = 0x50;
+        rb.sp -= 2;
+
+        time = 20;
+    }
+
     cpu_clock += time;
 }
 
@@ -80,5 +92,32 @@ void updateRegisters() {
     }
     else {
         ram[STAT] &= ~0b100;
+    }
+
+    if (ram[TAC] & 0b100) {
+        int rate = ram[TAC] & 0b11;
+
+        switch (rate) {
+            case 0:
+                rate = cpu_clock % 4096 ? 0 : 1;
+                break;
+            case 1:
+                rate = cpu_clock % 262144 ? 0 : 1;
+                break;
+            case 2:
+                rate = cpu_clock % 65536 ? 0 : 1;
+                break;
+            case 3:
+                rate = cpu_clock % 16384 ? 0 : 1;
+                break;
+        }
+
+        ram[TIMA] += rate;
+
+        if (ram[TIMA] == 0) {
+            ram[TIMA] = ram[TMA];
+
+            ram[IF] |= 0b100;
+        }
     }
 }
