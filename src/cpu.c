@@ -251,6 +251,26 @@ void nextInstruction() {
                 time = 8;
             }
             break;
+        case 0x0F:
+            {
+                bool carry = rb.a & 0b1;
+
+                rb.a >>= 1;
+                rb.a |= (carry << 7);
+                if (carry) rb.f |= 0b00010000;
+                else rb.f &= 0b11101111;
+
+                rb.f &= 0b00011111;
+
+                if (debug) {
+                    printf("RRCA");
+                }
+
+                rb.pc++;
+
+                time = 4;
+            }
+            break;
         case 0x10:
             {
                 if (debug) {
@@ -1657,6 +1677,16 @@ void nextInstruction() {
                 time = 8;
             }
             break;
+        case 0x76:
+            {
+                if (debug) {
+                    printf("HALT");
+                }
+                rb.pc++;
+
+                time = 4;
+            }
+            break;
         case 0x77:
             {
                 writeByte(rb.hl, rb.a);
@@ -2546,6 +2576,23 @@ void nextInstruction() {
                 time = 4;
             }
             break;
+        case 0xA6:
+            {
+                rb.a = rb.a & ram[rb.hl];
+
+                if (rb.a == 0) rb.f |= 0b10000000;
+                else rb.f &= 0b01111111;
+                rb.f |= 0b00100000;
+                rb.f &= 0b10101111;
+
+                if (debug) {
+                    printf("AND (HL)");
+                }
+                rb.pc++;
+
+                time = 8;
+            }
+            break;
         case 0xA7:
             {
                 rb.a = rb.a & rb.a;
@@ -3162,6 +3209,28 @@ void nextInstruction() {
                 rb.pc++;
                 uint8_t byte = ram[rb.pc];
                 switch (byte) {
+                    case 0x00:
+                        {
+                            bool carry = rb.b & 0b10000000;
+
+                            rb.b <<= 1;
+                            rb.b |= (carry >> 7);
+
+                            if (carry) rb.f |= 0b00010000;
+                            else rb.f &= 0b11101111;
+                            if (rb.b == 0) rb.f |= 0b10000000;
+                            else rb.f &= 0b01111111;
+                            rb.f &= 0b10011111;
+
+                            if (debug) {
+                                printf("RLC B");
+                            }
+
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
                     case 0x01:
                         {
                             bool carry = rb.c & 0b10000000;
@@ -3184,6 +3253,284 @@ void nextInstruction() {
                             time = 8;
                         }
                         break;
+                    case 0x02:
+                        {
+                            bool carry = rb.d & 0b10000000;
+
+                            rb.d <<= 1;
+                            rb.d |= (carry >> 7);
+
+                            if (carry) rb.f |= 0b00010000;
+                            else rb.f &= 0b11101111;
+                            if (rb.d == 0) rb.f |= 0b10000000;
+                            else rb.f &= 0b01111111;
+                            rb.f &= 0b10011111;
+
+                            if (debug) {
+                                printf("RLC D");
+                            }
+
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0x03:
+                        {
+                            bool carry = rb.e & 0b10000000;
+
+                            rb.e <<= 1;
+                            rb.e |= (carry >> 7);
+
+                            if (carry) rb.f |= 0b00010000;
+                            else rb.f &= 0b11101111;
+                            if (rb.e == 0) rb.f |= 0b10000000;
+                            else rb.f &= 0b01111111;
+                            rb.f &= 0b10011111;
+
+                            if (debug) {
+                                printf("RLC E");
+                            }
+
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0x04:
+                        {
+                            bool carry = rb.h & 0b10000000;
+
+                            rb.h <<= 1;
+                            rb.h |= (carry >> 7);
+
+                            if (carry) rb.f |= 0b00010000;
+                            else rb.f &= 0b11101111;
+                            if (rb.h == 0) rb.f |= 0b10000000;
+                            else rb.f &= 0b01111111;
+                            rb.f &= 0b10011111;
+
+                            if (debug) {
+                                printf("RLC H");
+                            }
+
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0x05:
+                        {
+                            bool carry = rb.l & 0b10000000;
+
+                            rb.l <<= 1;
+                            rb.l |= (carry >> 7);
+
+                            if (carry) rb.f |= 0b00010000;
+                            else rb.f &= 0b11101111;
+                            if (rb.l == 0) rb.f |= 0b10000000;
+                            else rb.f &= 0b01111111;
+                            rb.f &= 0b10011111;
+
+                            if (debug) {
+                                printf("RLC L");
+                            }
+
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0x07:
+                        {
+                            bool carry = rb.a & 0b10000000;
+
+                            rb.a <<= 1;
+                            rb.a |= (carry >> 7);
+
+                            if (carry) rb.f |= 0b00010000;
+                            else rb.f &= 0b11101111;
+                            if (rb.a == 0) rb.f |= 0b10000000;
+                            else rb.f &= 0b01111111;
+                            rb.f &= 0b10011111;
+
+                            if (debug) {
+                                printf("RLC A");
+                            }
+
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0x08:
+                        {
+                            bool carry = rb.b & 0b1;
+
+                            rb.b >>= 1;
+                            rb.b |= (carry << 7);
+                            if (carry) rb.f |= 0b00010000;
+                            else rb.f &= 0b11101111;
+                            if (rb.b == 0) rb.f |= 0b10000000;
+                            else rb.f &= 0b01111111;
+                            rb.f &= 0b10011111;
+
+                            if (debug) {
+                                printf("RRC B");
+                            }
+
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0x09:
+                        {
+                            bool carry = rb.c & 0b1;
+
+                            rb.c >>= 1;
+                            rb.c |= (carry << 7);
+                            if (carry) rb.f |= 0b00010000;
+                            else rb.f &= 0b11101111;
+                            if (rb.c == 0) rb.f |= 0b10000000;
+                            else rb.f &= 0b01111111;
+                            rb.f &= 0b10011111;
+
+                            if (debug) {
+                                printf("RRC C");
+                            }
+
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0x0A:
+                        {
+                            bool carry = rb.d & 0b1;
+
+                            rb.d >>= 1;
+                            rb.d |= (carry << 7);
+                            if (carry) rb.f |= 0b00010000;
+                            else rb.f &= 0b11101111;
+                            if (rb.d == 0) rb.f |= 0b10000000;
+                            else rb.f &= 0b01111111;
+                            rb.f &= 0b10011111;
+
+                            if (debug) {
+                                printf("RRC D");
+                            }
+
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0x0B:
+                        {
+                            bool carry = rb.e & 0b1;
+
+                            rb.e >>= 1;
+                            rb.e |= (carry << 7);
+                            if (carry) rb.f |= 0b00010000;
+                            else rb.f &= 0b11101111;
+                            if (rb.e == 0) rb.f |= 0b10000000;
+                            else rb.f &= 0b01111111;
+                            rb.f &= 0b10011111;
+
+                            if (debug) {
+                                printf("RRC E");
+                            }
+
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0x0C:
+                        {
+                            bool carry = rb.h & 0b1;
+
+                            rb.h >>= 1;
+                            rb.h |= (carry << 7);
+                            if (carry) rb.f |= 0b00010000;
+                            else rb.f &= 0b11101111;
+                            if (rb.h == 0) rb.f |= 0b10000000;
+                            else rb.f &= 0b01111111;
+                            rb.f &= 0b10011111;
+
+                            if (debug) {
+                                printf("RRC H");
+                            }
+
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0x0D:
+                        {
+                            bool carry = rb.l & 0b1;
+
+                            rb.l >>= 1;
+                            rb.l |= (carry << 7);
+                            if (carry) rb.f |= 0b00010000;
+                            else rb.f &= 0b11101111;
+                            if (rb.l == 0) rb.f |= 0b10000000;
+                            else rb.f &= 0b01111111;
+                            rb.f &= 0b10011111;
+
+                            if (debug) {
+                                printf("RRC L");
+                            }
+
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0x0F:
+                        {
+                            bool carry = rb.a & 0b1;
+
+                            rb.a >>= 1;
+                            rb.a |= (carry << 7);
+                            if (carry) rb.f |= 0b00010000;
+                            else rb.f &= 0b11101111;
+                            if (rb.a == 0) rb.f |= 0b10000000;
+                            else rb.f &= 0b01111111;
+                            rb.f &= 0b10011111;
+
+                            if (debug) {
+                                printf("RRC A");
+                            }
+
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0x10:
+                        {
+                            bool carry = rb.b & 0b10000000;
+
+                            rb.b <<= 1;
+                            rb.b |= (rb.f >> 4) & 1;
+                            if (carry) rb.f |= 0b00010000;
+                            else rb.f &= 0b11101111;
+
+                            if (rb.b == 0) rb.f |= 0b10000000;
+                            else rb.f &= 0b01111111;
+                            rb.f &= 0b10011111;
+
+                            if (debug) {
+                                printf("RL B");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
                     case 0x11:
                         {
                             bool carry = rb.c & 0b10000000;
@@ -3199,6 +3546,111 @@ void nextInstruction() {
 
                             if (debug) {
                                 printf("RL C");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0x12:
+                        {
+                            bool carry = rb.d & 0b10000000;
+
+                            rb.d <<= 1;
+                            rb.d |= (rb.f >> 4) & 1;
+                            if (carry) rb.f |= 0b00010000;
+                            else rb.f &= 0b11101111;
+
+                            if (rb.d == 0) rb.f |= 0b10000000;
+                            else rb.f &= 0b01111111;
+                            rb.f &= 0b10011111;
+
+                            if (debug) {
+                                printf("RL D");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0x13:
+                        {
+                            bool carry = rb.e & 0b10000000;
+
+                            rb.e <<= 1;
+                            rb.e |= (rb.f >> 4) & 1;
+                            if (carry) rb.f |= 0b00010000;
+                            else rb.f &= 0b11101111;
+
+                            if (rb.e == 0) rb.f |= 0b10000000;
+                            else rb.f &= 0b01111111;
+                            rb.f &= 0b10011111;
+
+                            if (debug) {
+                                printf("RL E");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0x14:
+                        {
+                            bool carry = rb.h & 0b10000000;
+
+                            rb.h <<= 1;
+                            rb.h |= (rb.f >> 4) & 1;
+                            if (carry) rb.f |= 0b00010000;
+                            else rb.f &= 0b11101111;
+
+                            if (rb.h == 0) rb.f |= 0b10000000;
+                            else rb.f &= 0b01111111;
+                            rb.f &= 0b10011111;
+
+                            if (debug) {
+                                printf("RL H");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0x15:
+                        {
+                            bool carry = rb.l & 0b10000000;
+
+                            rb.l <<= 1;
+                            rb.l |= (rb.f >> 4) & 1;
+                            if (carry) rb.f |= 0b00010000;
+                            else rb.f &= 0b11101111;
+
+                            if (rb.l == 0) rb.f |= 0b10000000;
+                            else rb.f &= 0b01111111;
+                            rb.f &= 0b10011111;
+
+                            if (debug) {
+                                printf("RL L");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0x17:
+                        {
+                            bool carry = rb.a & 0b10000000;
+
+                            rb.a <<= 1;
+                            rb.a |= (rb.f >> 4) & 1;
+                            if (carry) rb.f |= 0b00010000;
+                            else rb.f &= 0b11101111;
+
+                            if (rb.a == 0) rb.f |= 0b10000000;
+                            else rb.f &= 0b01111111;
+                            rb.f &= 0b10011111;
+
+                            if (debug) {
+                                printf("RL A");
                             }
                             rb.pc++;
 
@@ -3268,9 +3720,31 @@ void nextInstruction() {
                             time = 8;
                         }
                         break;
+                    case 0x26:
+                        {
+                            bool carry = ram[rb.hl] & 0b10000000;
+
+                            writeByte(rb.hl, ram[rb.hl] << 1);
+
+                            if (carry) rb.f |= 0b00010000;
+                            else rb.f &= 0b11101111;
+
+                            if (ram[rb.hl] == 0) rb.f |= 0b10000000;
+                            else rb.f &= 0b01111111;
+                            rb.f &= 0b10011111;
+
+                            if (debug) {
+                                printf("SLA (HL)");
+                            }
+
+                            rb.pc++;
+
+                            time = 16;
+                        }
+                        break;
                     case 0x27:
                         {
-                            bool carry = rb.c & 0b10000000;
+                            bool carry = rb.a & 0b10000000;
 
                             rb.a <<= 1;
                             if (carry) rb.f |= 0b00010000;
@@ -3427,6 +3901,21 @@ void nextInstruction() {
                             time = 8;
                         }
                         break;
+                    case 0x4F:
+                        {
+                            if (rb.a & 0b10) rb.f &= 0b01111111;
+                            else rb.f |= 0b10000000;
+                            rb.f &= 0b10111111;
+                            rb.f |= 0b00100000;
+
+                            if (debug) {
+                                printf("BIT 1, A");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
                     case 0x50:
                         {
                             if (rb.b & 0b100) rb.f &= 0b01111111;
@@ -3547,6 +4036,21 @@ void nextInstruction() {
                             time = 8;
                         }
                         break;
+                    case 0x6E:
+                        {
+                            if (ram[rb.hl] & 0b100000) rb.f &= 0b01111111;
+                            else rb.f |= 0b10000000;
+                            rb.f &= 0b10111111;
+                            rb.f |= 0b00100000;
+
+                            if (debug) {
+                                printf("BIT 5, (HL)");
+                            }
+                            rb.pc++;
+
+                            time = 12;
+                        }
+                        break;
                     case 0x6F:
                         {
                             if (rb.a & 0b100000) rb.f &= 0b01111111;
@@ -3590,6 +4094,21 @@ void nextInstruction() {
                             rb.pc++;
 
                             time = 8;
+                        }
+                        break;
+                    case 0x76:
+                        {
+                            if (ram[rb.hl] & 0b1000000) rb.f &= 0b01111111;
+                            else rb.f |= 0b10000000;
+                            rb.f &= 0b10111111;
+                            rb.f |= 0b00100000;
+
+                            if (debug) {
+                                printf("BIT 6, (HL)");
+                            }
+                            rb.pc++;
+
+                            time = 12;
                         }
                         break;
                     case 0x77:
@@ -3706,12 +4225,48 @@ void nextInstruction() {
                             time = 8;
                         }
                         break;
+                    case 0x8E:
+                        {
+                            writeByte(rb.hl, ram[rb.hl] & ~0b10);
+
+                            if (debug) {
+                                printf("RES 1, (HL)");
+                            }
+                            rb.pc++;
+
+                            time = 16;
+                        }
+                        break;
+                    case 0x96:
+                        {
+                            writeByte(rb.hl, ram[rb.hl] & ~0b100);
+
+                            if (debug) {
+                                printf("RES 2, (HL)");
+                            }
+                            rb.pc++;
+
+                            time = 16;
+                        }
+                        break;
                     case 0x9E:
                         {
                             writeByte(rb.hl, ram[rb.hl] & ~0b1000);
 
                             if (debug) {
                                 printf("RES 3, (HL)");
+                            }
+                            rb.pc++;
+
+                            time = 16;
+                        }
+                        break;
+                    case 0xAE:
+                        {
+                            writeByte(rb.hl, ram[rb.hl] & ~0b100000);
+
+                            if (debug) {
+                                printf("RES 5, (HL)");
                             }
                             rb.pc++;
 
@@ -3730,6 +4285,78 @@ void nextInstruction() {
                             time = 16;
                         }
                         break;
+                    case 0xC6:
+                        {
+                            writeByte(rb.hl, ram[rb.hl] | 0b1);
+
+                            if (debug) {
+                                printf("SET 0, (HL)");
+                            }
+                            rb.pc++;
+
+                            time = 16;
+                        }
+                        break;
+                    case 0xC7:
+                        {
+                            rb.a = rb.a | 0b1;
+
+                            if (debug) {
+                                printf("SET 0, A");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0xCE:
+                        {
+                            writeByte(rb.hl, ram[rb.hl] | 0b10);
+
+                            if (debug) {
+                                printf("SET 1, (HL)");
+                            }
+                            rb.pc++;
+
+                            time = 16;
+                        }
+                        break;
+                    case 0xCF:
+                        {
+                            rb.a = rb.a | 0b10;
+
+                            if (debug) {
+                                printf("SET 1, A");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0xD6:
+                        {
+                            writeByte(rb.hl, ram[rb.hl] | 0b100);
+
+                            if (debug) {
+                                printf("SET 2, (HL)");
+                            }
+                            rb.pc++;
+
+                            time = 16;
+                        }
+                        break;
+                    case 0xD7:
+                        {
+                            rb.a = rb.a | 0b100;
+
+                            if (debug) {
+                                printf("SET 2, A");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
                     case 0xDE:
                         {
                             writeByte(rb.hl, ram[rb.hl] | 0b1000);
@@ -3742,6 +4369,42 @@ void nextInstruction() {
                             time = 16;
                         }
                         break;
+                    case 0xEE:
+                        {
+                            writeByte(rb.hl, ram[rb.hl] | 0b100000);
+
+                            if (debug) {
+                                printf("SET 5, (HL)");
+                            }
+                            rb.pc++;
+
+                            time = 16;
+                        }
+                        break;
+                    case 0xEF:
+                        {
+                            rb.a = rb.a | 0b100000;
+
+                            if (debug) {
+                                printf("SET 5, A");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0xF7:
+                        {
+                            rb.a = rb.a | 0b1000000;
+
+                            if (debug) {
+                                printf("SET 6, A");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
                     case 0xFE:
                         {
                             writeByte(rb.hl, ram[rb.hl] | 0b10000000);
@@ -3752,6 +4415,18 @@ void nextInstruction() {
                             rb.pc++;
 
                             time = 16;
+                        }
+                        break;
+                    case 0xFF:
+                        {
+                            rb.a = rb.a | 0b10000000;
+
+                            if (debug) {
+                                printf("SET 7, A");
+                            }
+                            rb.pc++;
+
+                            time = 8;
                         }
                         break;
                     default:

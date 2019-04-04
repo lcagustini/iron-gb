@@ -258,9 +258,13 @@ int main(int argc, char* argv[]) {
 
                             uint64_t i = 32*(sy/8) + sx/8;
                             uint8_t tile = ram[(ram[LCDC] & 0b1000 ? 0x9C00 : 0x9800) + i];
+                            uint8_t tileset = ram[LCDC] & 0b10000;
+                            if (!tileset) {
+                                tile += 128;
+                            }
 
-                            uint8_t low = ram[(ram[LCDC] & 0b10000 ? 0x8000 : 0x8800) + tile*16 + 2*(sy % 8)];
-                            uint8_t high = ram[(ram[LCDC] & 0b10000 ? 0x8001 : 0x8801) + tile*16 + 2*(sy % 8)];
+                            uint8_t low = ram[(tileset ? 0x8000 : 0x8800) + tile*16 + 2*(sy % 8)];
+                            uint8_t high = ram[(tileset ? 0x8001 : 0x8801) + tile*16 + 2*(sy % 8)];
 
                             uint8_t tx = sx % 8;
                             uint8_t pixel = (((low << tx) & 0xFF) >> 7) | ((((high << tx) & 0xFF) >> 7) << 1);
@@ -320,6 +324,24 @@ int main(int argc, char* argv[]) {
                             SDL_FillRect(draw_surface, NULL, 0xFFFFFF);
                         }
                         SDL_BlitScaled(draw_surface, NULL, screen_surface, NULL);
+#if SHOW_TILESET
+                        for (int tile = 0; tile < 384; tile++) {
+                            int tx = 8*(tile % (ZOOM*20));
+                            int ty = 8*(tile / (ZOOM*20));
+                            for (int y = 0; y < 8; y++) {
+                                uint8_t low = ram[0x8000 + 16*tile + 2*y];
+                                uint8_t high = ram[0x8001 + 16*tile + 2*y];
+
+                                for (int x = 0; x < 8; x++) {
+                                    uint8_t pixel = (((low << x) & 0xFF) >> 7) | ((((high << x) & 0xFF) >> 7) << 1);
+                                    uint32_t color = 0xFFFFFF - (((ram[BGP] >> (2*pixel)) & 0b11) * 5592405);
+
+                                    Uint32 *pixels = (Uint32 *)screen_surface->pixels;
+                                    pixels[((ty+y)*screen_surface->w) + (tx+x)] = color;
+                                }
+                            }
+                        }
+#endif
                         SDL_UpdateWindowSurface(window);
 
                         ram[IF] |= 0b1;
