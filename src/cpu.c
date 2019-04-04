@@ -3371,6 +3371,8 @@ void nextInstruction() {
                         {
                             if (rb.b & 0b1) rb.f &= 0b01111111;
                             else rb.f |= 0b10000000;
+                            rb.f &= 0b10111111;
+                            rb.f |= 0b00100000;
 
                             if (debug) {
                                 printf("BIT 0, B");
@@ -3384,6 +3386,8 @@ void nextInstruction() {
                         {
                             if (rb.c & 0b1) rb.f &= 0b01111111;
                             else rb.f |= 0b10000000;
+                            rb.f &= 0b10111111;
+                            rb.f |= 0b00100000;
 
                             if (debug) {
                                 printf("BIT 0, C");
@@ -3397,6 +3401,8 @@ void nextInstruction() {
                         {
                             if (rb.a & 0b1) rb.f &= 0b01111111;
                             else rb.f |= 0b10000000;
+                            rb.f &= 0b10111111;
+                            rb.f |= 0b00100000;
 
                             if (debug) {
                                 printf("BIT 0, A");
@@ -3410,6 +3416,8 @@ void nextInstruction() {
                         {
                             if (rb.b & 0b10) rb.f &= 0b01111111;
                             else rb.f |= 0b10000000;
+                            rb.f &= 0b10111111;
+                            rb.f |= 0b00100000;
 
                             if (debug) {
                                 printf("BIT 1, B");
@@ -3423,6 +3431,8 @@ void nextInstruction() {
                         {
                             if (rb.b & 0b100) rb.f &= 0b01111111;
                             else rb.f |= 0b10000000;
+                            rb.f &= 0b10111111;
+                            rb.f |= 0b00100000;
 
                             if (debug) {
                                 printf("BIT 2, B");
@@ -3436,6 +3446,8 @@ void nextInstruction() {
                         {
                             if (rb.a & 0b100) rb.f &= 0b01111111;
                             else rb.f |= 0b10000000;
+                            rb.f &= 0b10111111;
+                            rb.f |= 0b00100000;
 
                             if (debug) {
                                 printf("BIT 2, A");
@@ -3449,6 +3461,8 @@ void nextInstruction() {
                         {
                             if (rb.b & 0b1000) rb.f &= 0b01111111;
                             else rb.f |= 0b10000000;
+                            rb.f &= 0b10111111;
+                            rb.f |= 0b00100000;
 
                             if (debug) {
                                 printf("BIT 3, B");
@@ -3462,6 +3476,8 @@ void nextInstruction() {
                         {
                             if (rb.a & 0b1000) rb.f &= 0b01111111;
                             else rb.f |= 0b10000000;
+                            rb.f &= 0b10111111;
+                            rb.f |= 0b00100000;
 
                             if (debug) {
                                 printf("BIT 3, A");
@@ -3475,6 +3491,8 @@ void nextInstruction() {
                         {
                             if (rb.b & 0b10000) rb.f &= 0b01111111;
                             else rb.f |= 0b10000000;
+                            rb.f &= 0b10111111;
+                            rb.f |= 0b00100000;
 
                             if (debug) {
                                 printf("BIT 4, B");
@@ -3488,6 +3506,8 @@ void nextInstruction() {
                         {
                             if (rb.c & 0b10000) rb.f &= 0b01111111;
                             else rb.f |= 0b10000000;
+                            rb.f &= 0b10111111;
+                            rb.f |= 0b00100000;
 
                             if (debug) {
                                 printf("BIT 4, C");
@@ -3501,6 +3521,8 @@ void nextInstruction() {
                         {
                             if (rb.b & 0b100000) rb.f &= 0b01111111;
                             else rb.f |= 0b10000000;
+                            rb.f &= 0b10111111;
+                            rb.f |= 0b00100000;
 
                             if (debug) {
                                 printf("BIT 5, B");
@@ -3514,6 +3536,8 @@ void nextInstruction() {
                         {
                             if (rb.c & 0b100000) rb.f &= 0b01111111;
                             else rb.f |= 0b10000000;
+                            rb.f &= 0b10111111;
+                            rb.f |= 0b00100000;
 
                             if (debug) {
                                 printf("BIT 5, C");
@@ -3527,6 +3551,8 @@ void nextInstruction() {
                         {
                             if (rb.a & 0b100000) rb.f &= 0b01111111;
                             else rb.f |= 0b10000000;
+                            rb.f &= 0b10111111;
+                            rb.f |= 0b00100000;
 
                             if (debug) {
                                 printf("BIT 5, A");
@@ -3540,9 +3566,26 @@ void nextInstruction() {
                         {
                             if (rb.b & 0b1000000) rb.f &= 0b01111111;
                             else rb.f |= 0b10000000;
+                            rb.f &= 0b10111111;
+                            rb.f |= 0b00100000;
 
                             if (debug) {
                                 printf("BIT 6, B");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0x71:
+                        {
+                            if (rb.c & 0b1000000) rb.f &= 0b01111111;
+                            else rb.f |= 0b10000000;
+                            rb.f &= 0b10111111;
+                            rb.f |= 0b00100000;
+
+                            if (debug) {
+                                printf("BIT 6, C");
                             }
                             rb.pc++;
 
@@ -3553,6 +3596,8 @@ void nextInstruction() {
                         {
                             if (rb.a & 0b1000000) rb.f &= 0b01111111;
                             else rb.f |= 0b10000000;
+                            rb.f &= 0b10111111;
+                            rb.f |= 0b00100000;
 
                             if (debug) {
                                 printf("BIT 6, A");
@@ -3566,9 +3611,26 @@ void nextInstruction() {
                         {
                             if (rb.b & 0b10000000) rb.f &= 0b01111111;
                             else rb.f |= 0b10000000;
+                            rb.f &= 0b10111111;
+                            rb.f |= 0b00100000;
 
                             if (debug) {
                                 printf("BIT 7, B");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0x79:
+                        {
+                            if (rb.c & 0b10000000) rb.f &= 0b01111111;
+                            else rb.f |= 0b10000000;
+                            rb.f &= 0b10111111;
+                            rb.f |= 0b00100000;
+
+                            if (debug) {
+                                printf("BIT 7, C");
                             }
                             rb.pc++;
 
@@ -3579,6 +3641,8 @@ void nextInstruction() {
                         {
                             if (rb.h & 0b10000000) rb.f &= 0b01111111;
                             else rb.f |= 0b10000000;
+                            rb.f &= 0b10111111;
+                            rb.f |= 0b00100000;
 
                             if (debug) {
                                 printf("BIT 7, H");
@@ -3592,6 +3656,8 @@ void nextInstruction() {
                         {
                             if (ram[rb.hl] & 0b10000000) rb.f &= 0b01111111;
                             else rb.f |= 0b10000000;
+                            rb.f &= 0b10111111;
+                            rb.f |= 0b00100000;
 
                             if (debug) {
                                 printf("BIT 7, (HL)");
@@ -3605,6 +3671,8 @@ void nextInstruction() {
                         {
                             if (rb.a & 0b10000000) rb.f &= 0b01111111;
                             else rb.f |= 0b10000000;
+                            rb.f &= 0b10111111;
+                            rb.f |= 0b00100000;
 
                             if (debug) {
                                 printf("BIT 7, A");
