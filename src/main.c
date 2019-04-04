@@ -247,8 +247,10 @@ int main(int argc, char* argv[]) {
                     uint8_t y = ram[LY];
                     if (ram[LCDC] & 0b1) {
                         for (int x = 0; x < 160; x++) {
-                            uint8_t sx = x /*+ ram[SCX]*/; //TODO: Fix scrolling
-                            uint8_t sy = y /*+ ram[SCY]*/;
+                            uint8_t sx = x + ram[SCX];
+                            if (sx > 160) sx = 160;
+                            uint8_t sy = y + ram[SCY];
+                            if (sy > 144) sy = 144;
 
                             uint64_t i = 32*(sy/8) + sx/8;
                             uint8_t tile = ram[(ram[LCDC] & 0b1000 ? 0x9C00 : 0x9800) + i];
