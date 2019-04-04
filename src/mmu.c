@@ -71,6 +71,7 @@ void handleInterrupts() {
         time = 20;
     }
 
+    //STAT
     if ((ram[IE] & 0b10) && (ram[IF] & 0b10)) {
         IME = false;
         ram[IF] &= ~0b10;
@@ -83,6 +84,7 @@ void handleInterrupts() {
         time = 20;
     }
 
+    //Timer Overflow
     if ((ram[IE] & 0b100) && (ram[IF] & 0b100)) {
         IME = false;
         ram[IF] &= ~0b100;
@@ -90,6 +92,32 @@ void handleInterrupts() {
         writeByte(rb.sp -1, (rb.pc & 0xFF00) >> 8);
         writeByte(rb.sp -2, (rb.pc & 0xFF));
         rb.pc = 0x50;
+        rb.sp -= 2;
+
+        time = 20;
+    }
+
+    //Serial
+    if ((ram[IE] & 0b1000) && (ram[IF] & 0b1000)) {
+        IME = false;
+        ram[IF] &= ~0b1000;
+
+        writeByte(rb.sp -1, (rb.pc & 0xFF00) >> 8);
+        writeByte(rb.sp -2, (rb.pc & 0xFF));
+        rb.pc = 0x58;
+        rb.sp -= 2;
+
+        time = 20;
+    }
+
+    //Joypad
+    if ((ram[IE] & 0b10000) && (ram[IF] & 0b10000)) {
+        IME = false;
+        ram[IF] &= ~0b10000;
+
+        writeByte(rb.sp -1, (rb.pc & 0xFF00) >> 8);
+        writeByte(rb.sp -2, (rb.pc & 0xFF));
+        rb.pc = 0x60;
         rb.sp -= 2;
 
         time = 20;
@@ -128,6 +156,10 @@ void getInput() {
         if (SDL_GetKeyboardState(NULL)[SDL_SCANCODE_RETURN]) {
             ram[P1] &= ~0b1000;
         }
+    }
+
+    if (~ram[P1] & 0b1111) {
+        ram[IF] |= 0b10000;
     }
 }
 
