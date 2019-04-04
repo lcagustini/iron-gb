@@ -19,8 +19,10 @@ void nextInstruction() {
     uint8_t time = 0;
     uint8_t byte = ram[rb.pc];
     switch (byte) {
-        case 0xF2:
         case 0x00:
+        case 0xDD:
+        case 0xE3:
+        case 0xE4:
             {
                 if (debug) {
                     printf("NOP");
@@ -144,7 +146,8 @@ void nextInstruction() {
             {
                 uint16_t imm = ram[rb.pc+1] | (ram[rb.pc+2] << 8);
 
-                writeByte(imm, rb.sp);
+                writeByte(imm+1, (rb.sp & 0xFF00) >> 8);
+                writeByte(imm, (rb.sp & 0xFF));
 
                 if (debug) {
                     printf("LD (0x%04X), SP", imm);
@@ -936,6 +939,18 @@ void nextInstruction() {
 
                 if (debug) {
                     printf("LDD A, (HL)");
+                }
+                rb.pc++;
+
+                time = 8;
+            }
+            break;
+        case 0x3B:
+            {
+                rb.sp--;
+
+                if (debug) {
+                    printf("DEC SP");
                 }
                 rb.pc++;
 
@@ -2105,7 +2120,7 @@ void nextInstruction() {
                 if ((int)(rb.a & 0xF) - (int)(rb.b & 0xF) < 0) rb.f |= 0b00100000;
                 else rb.f &= ~0b00100000;
                 if ((int)(rb.a & 0xFF) - (int)(rb.b & 0xFF) < 0) rb.f |= 0b00010000;
-                else rb.f &= 0b00010000;
+                else rb.f &= ~0b00010000;
 
                 rb.a = rb.a - rb.b;
 
@@ -2126,7 +2141,7 @@ void nextInstruction() {
                 if ((int)(rb.a & 0xF) - (int)(rb.c & 0xF) < 0) rb.f |= 0b00100000;
                 else rb.f &= ~0b00100000;
                 if ((int)(rb.a & 0xFF) - (int)(rb.c & 0xFF) < 0) rb.f |= 0b00010000;
-                else rb.f &= 0b00010000;
+                else rb.f &= ~0b00010000;
 
                 rb.a = rb.a - rb.c;
 
@@ -2147,7 +2162,7 @@ void nextInstruction() {
                 if ((int)(rb.a & 0xF) - (int)(rb.d & 0xF) < 0) rb.f |= 0b00100000;
                 else rb.f &= ~0b00100000;
                 if ((int)(rb.a & 0xFF) - (int)(rb.d & 0xFF) < 0) rb.f |= 0b00010000;
-                else rb.f &= 0b00010000;
+                else rb.f &= ~0b00010000;
 
                 rb.a = rb.a - rb.d;
 
@@ -2168,7 +2183,7 @@ void nextInstruction() {
                 if ((int)(rb.a & 0xF) - (int)(rb.e & 0xF) < 0) rb.f |= 0b00100000;
                 else rb.f &= ~0b00100000;
                 if ((int)(rb.a & 0xFF) - (int)(rb.e & 0xFF) < 0) rb.f |= 0b00010000;
-                else rb.f &= 0b00010000;
+                else rb.f &= ~0b00010000;
 
                 rb.a = rb.a - rb.e;
 
@@ -2189,7 +2204,7 @@ void nextInstruction() {
                 if ((int)(rb.a & 0xF) - (int)(rb.h & 0xF) < 0) rb.f |= 0b00100000;
                 else rb.f &= ~0b00100000;
                 if ((int)(rb.a & 0xFF) - (int)(rb.h & 0xFF) < 0) rb.f |= 0b00010000;
-                else rb.f &= 0b00010000;
+                else rb.f &= ~0b00010000;
 
                 rb.a = rb.a - rb.h;
 
@@ -2210,7 +2225,7 @@ void nextInstruction() {
                 if ((int)(rb.a & 0xF) - (int)(rb.l & 0xF) < 0) rb.f |= 0b00100000;
                 else rb.f &= ~0b00100000;
                 if ((int)(rb.a & 0xFF) - (int)(rb.l & 0xFF) < 0) rb.f |= 0b00010000;
-                else rb.f &= 0b00010000;
+                else rb.f &= ~0b00010000;
 
                 rb.a = rb.a - rb.l;
 
@@ -2231,7 +2246,7 @@ void nextInstruction() {
                 if ((int)(rb.a & 0xF) - (int)(ram[rb.hl] & 0xF) < 0) rb.f |= 0b00100000;
                 else rb.f &= ~0b00100000;
                 if ((int)(rb.a & 0xFF) - (int)(ram[rb.hl] & 0xFF) < 0) rb.f |= 0b00010000;
-                else rb.f &= 0b00010000;
+                else rb.f &= ~0b00010000;
 
                 rb.a = rb.a - ram[rb.hl];
 
@@ -2252,7 +2267,7 @@ void nextInstruction() {
                 if ((int)(rb.a & 0xF) - (int)(rb.a & 0xF) < 0) rb.f |= 0b00100000;
                 else rb.f &= ~0b00100000;
                 if ((int)(rb.a & 0xFF) - (int)(rb.a & 0xFF) < 0) rb.f |= 0b00010000;
-                else rb.f &= 0b00010000;
+                else rb.f &= ~0b00010000;
 
                 rb.a = rb.a - rb.a;
 
@@ -3069,11 +3084,26 @@ void nextInstruction() {
                 rb.f &= 0b10111111;
 
                 if (debug) {
-                    printf("ADD A, %02X", imm);
+                    printf("ADD A, 0x%02X", imm);
                 }
                 rb.pc += 2;
 
                 time = 8;
+            }
+            break;
+        case 0xC7:
+            {
+                rb.pc++;
+                writeByte(rb.sp -1, (rb.pc & 0xFF00) >> 8);
+                writeByte(rb.sp -2, (rb.pc & 0xFF));
+                rb.pc = 0x0;
+                rb.sp = rb.sp-2;
+
+                if (debug) {
+                    printf("RST 0x0");
+                }
+
+                time = 16;
             }
             break;
         case 0xC8:
@@ -3662,6 +3692,28 @@ void nextInstruction() {
                 }
             }
             break;
+        case 0xCC:
+            {
+                uint16_t addr = ram[rb.pc+1] | (ram[rb.pc+2] << 8);
+                rb.pc += 3;
+
+                if (rb.f & 0b10000000) {
+                    writeByte(rb.sp -1, (rb.pc & 0xFF00) >> 8);
+                    writeByte(rb.sp -2, (rb.pc & 0xFF));
+                    rb.pc = addr;
+                    rb.sp -= 2;
+
+                    time = 24;
+                }
+                else {
+                    time = 12;
+                }
+
+                if (debug) {
+                    printf("CALL Z, 0x%04X", addr);
+                }
+            }
+            break;
         case 0xCD:
             {
                 uint16_t addr = ram[rb.pc+1] | (ram[rb.pc+2] << 8);
@@ -3703,6 +3755,21 @@ void nextInstruction() {
                 time = 8;
             }
             break;
+        case 0xCF:
+            {
+                rb.pc++;
+                writeByte(rb.sp -1, (rb.pc & 0xFF00) >> 8);
+                writeByte(rb.sp -2, (rb.pc & 0xFF));
+                rb.pc = 0x8;
+                rb.sp = rb.sp-2;
+
+                if (debug) {
+                    printf("RST 0x8");
+                }
+
+                time = 16;
+            }
+            break;
         case 0xD0:
             {
                 if (!(rb.f & 0b00010000)) {
@@ -3736,6 +3803,48 @@ void nextInstruction() {
                 time = 12;
             }
             break;
+        case 0xD2:
+            {
+                uint16_t addr = ram[rb.pc+1] | (ram[rb.pc+2] << 8);
+
+                if (!(rb.f & 0b00010000)) {
+                    rb.pc = addr;
+
+                    time = 16;
+                }
+                else {
+                    rb.pc += 3;
+
+                    time = 12;
+                }
+
+                if (debug) {
+                    printf("JP NC, 0x%04X", addr);
+                }
+            }
+            break;
+        case 0xD4:
+            {
+                uint16_t addr = ram[rb.pc+1] | (ram[rb.pc+2] << 8);
+                rb.pc += 3;
+
+                if (!(rb.f & 0b00010000)) {
+                    writeByte(rb.sp -1, (rb.pc & 0xFF00) >> 8);
+                    writeByte(rb.sp -2, (rb.pc & 0xFF));
+                    rb.pc = addr;
+                    rb.sp -= 2;
+
+                    time = 24;
+                }
+                else {
+                    time = 12;
+                }
+
+                if (debug) {
+                    printf("CALL NC, 0x%04X", addr);
+                }
+            }
+            break;
         case 0xD5:
             {
                 writeByte(rb.sp -1, rb.d);
@@ -3753,10 +3862,11 @@ void nextInstruction() {
         case 0xD6:
             {
                 uint8_t imm = ram[rb.pc+1];
-                if ((int)(rb.a & 0xF) - (int)(imm & 0xF) < 0) rb.f |= 0b00100000;
+
+                if (((int)(rb.a & 0xF) - (int)(imm & 0xF)) < 0) rb.f |= 0b00100000;
                 else rb.f &= ~0b00100000;
                 if ((int)(rb.a & 0xFF) - (int)(imm & 0xFF) < 0) rb.f |= 0b00010000;
-                else rb.f &= 0b00010000;
+                else rb.f &= ~0b00010000;
 
                 rb.a = rb.a - imm;
 
@@ -3765,11 +3875,26 @@ void nextInstruction() {
                 rb.f |= 0b01000000;
 
                 if (debug) {
-                    printf("SUB A, %02X", imm);
+                    printf("SUB A, 0x%02X", imm);
                 }
-                rb.pc++;
+                rb.pc += 2;
 
-                time = 4;
+                time = 8;
+            }
+            break;
+        case 0xD7:
+            {
+                rb.pc++;
+                writeByte(rb.sp -1, (rb.pc & 0xFF00) >> 8);
+                writeByte(rb.sp -2, (rb.pc & 0xFF));
+                rb.pc = 0x10;
+                rb.sp = rb.sp-2;
+
+                if (debug) {
+                    printf("RST 0x10");
+                }
+
+                time = 16;
             }
             break;
         case 0xD8:
@@ -3804,14 +3929,56 @@ void nextInstruction() {
                 time = 16;
             }
             break;
+        case 0xDA:
+            {
+                uint16_t addr = ram[rb.pc+1] | (ram[rb.pc+2] << 8);
+
+                if (rb.f & 0b00010000) {
+                    rb.pc = addr;
+
+                    time = 16;
+                }
+                else {
+                    rb.pc += 3;
+
+                    time = 12;
+                }
+
+                if (debug) {
+                    printf("JP C, 0x%04X", addr);
+                }
+            }
+            break;
+        case 0xDC:
+            {
+                uint16_t addr = ram[rb.pc+1] | (ram[rb.pc+2] << 8);
+                rb.pc += 3;
+
+                if (rb.f & 0b00010000) {
+                    writeByte(rb.sp -1, (rb.pc & 0xFF00) >> 8);
+                    writeByte(rb.sp -2, (rb.pc & 0xFF));
+                    rb.pc = addr;
+                    rb.sp -= 2;
+
+                    time = 24;
+                }
+                else {
+                    time = 12;
+                }
+
+                if (debug) {
+                    printf("CALL C, 0x%04X", addr);
+                }
+            }
+            break;
         case 0xDE:
             {
                 uint8_t imm = ram[rb.pc+1];
                 uint8_t carry = ((rb.f >> 4) & 1);
 
-                if ((int)(rb.a & 0xF) - (int)(imm & 0xF) - (int)carry > 0xF) rb.f |= 0b00100000;
+                if ((int)(rb.a & 0xF) - (int)(imm & 0xF) - (int)carry < 0) rb.f |= 0b00100000;
                 else rb.f &= ~0b00100000;
-                if ((int)(rb.a & 0xFF) - (int)(imm & 0xFF) - (int)carry > 0xFF) rb.f |= 0b00010000;
+                if ((int)(rb.a & 0xFF) - (int)(imm & 0xFF) - (int)carry < 0) rb.f |= 0b00010000;
                 else rb.f &= ~0b00010000;
 
                 rb.a = rb.a - imm - carry;
@@ -3821,7 +3988,7 @@ void nextInstruction() {
                 rb.f |= 0b01000000;
 
                 if (debug) {
-                    printf("SBC A, %02X", imm);
+                    printf("SBC A, 0x%02X", imm);
                 }
                 rb.pc += 2;
 
@@ -3917,19 +4084,42 @@ void nextInstruction() {
                 time = 8;
             }
             break;
+        case 0xE7:
+            {
+                rb.pc++;
+                writeByte(rb.sp -1, (rb.pc & 0xFF00) >> 8);
+                writeByte(rb.sp -2, (rb.pc & 0xFF));
+                rb.pc = 0x20;
+                rb.sp = rb.sp-2;
+
+                if (debug) {
+                    printf("RST 0x20");
+                }
+
+                time = 16;
+            }
+            break;
         case 0xE8:
             {
                 int8_t imm = ram[rb.pc+1];
-                if ((rb.a & 0xF) + (imm & 0xF) > 0xF) rb.f |= 0b00100000;
-                else rb.f &= ~0b00100000;
-                if ((rb.a & 0xFF) + (imm & 0xFF) > 0xFF) rb.f |= 0b00010000;
-                else rb.f &= ~0b00010000;
 
-                rb.a = rb.a + imm;
+                if (imm >= 0) {
+                    if ((rb.sp & 0xF) + (imm & 0xF) > 0xF) rb.f |= 0b00100000;
+                    else rb.f &= ~0b00100000;
+                    if ((rb.sp & 0xFF) + (imm & 0xFF) > 0xFF) rb.f |= 0b00010000;
+                    else rb.f &= ~0b00010000;
+                }
+                else {
+                    int temp = (int)rb.sp + imm;
+                    if ((temp & 0xF) <= (rb.sp & 0xF)) rb.f |= 0b00100000;
+                    else rb.f &= ~0b00100000;
+                    if ((temp & 0xFF) <= (rb.sp & 0xFF)) rb.f |= 0b00010000;
+                    else rb.f &= ~0b00010000;
+                }
 
-                if (rb.a == 0) rb.f |= 0b10000000;
-                else rb.f &= 0b01111111;
-                rb.f &= 0b10111111;
+                rb.sp = rb.sp + imm;
+
+                rb.f &= 0b00111111;
 
                 if (debug) {
                     printf("ADD SP, 0x%02X", imm);
@@ -4024,6 +4214,20 @@ void nextInstruction() {
                 time = 12;
             }
             break;
+        case 0xF2:
+            {
+                uint16_t imm = rb.c;
+                imm += 0xFF00;
+                rb.a = ram[imm];
+
+                if (debug) {
+                    printf("LDH A, (C)", imm);
+                }
+                rb.pc++;
+
+                time = 8;
+            }
+            break;
         case 0xF3:
             {
                 IME = false;
@@ -4068,9 +4272,39 @@ void nextInstruction() {
                 time = 8;
             }
             break;
+        case 0xF7:
+            {
+                rb.pc++;
+                writeByte(rb.sp -1, (rb.pc & 0xFF00) >> 8);
+                writeByte(rb.sp -2, (rb.pc & 0xFF));
+                rb.pc = 0x30;
+                rb.sp = rb.sp-2;
+
+                if (debug) {
+                    printf("RST 0x30");
+                }
+
+                time = 16;
+            }
+            break;
         case 0xF8:
             {
-                uint8_t imm = ram[rb.pc+1];
+                int8_t imm = ram[rb.pc+1];
+
+                if (imm >= 0) {
+                    if ((rb.sp & 0xF) + (imm & 0xF) > 0xF) rb.f |= 0b00100000;
+                    else rb.f &= ~0b00100000;
+                    if ((rb.sp & 0xFF) + (imm & 0xFF) > 0xFF) rb.f |= 0b00010000;
+                    else rb.f &= ~0b00010000;
+                }
+                else {
+                    int temp = (int)rb.sp + imm;
+                    if ((temp & 0xF) <= (rb.sp & 0xF)) rb.f |= 0b00100000;
+                    else rb.f &= ~0b00100000;
+                    if ((temp & 0xFF) <= (rb.sp & 0xFF)) rb.f |= 0b00010000;
+                    else rb.f &= ~0b00010000;
+                }
+                rb.f &= 0b00111111;
 
                 rb.hl = rb.sp + imm;
 
@@ -4101,7 +4335,7 @@ void nextInstruction() {
                 rb.a = ram[addr];
 
                 if (debug) {
-                    printf("LD A, (%04X)", addr);
+                    printf("LD A, (0x%04X)", addr);
                 }
                 rb.pc += 3;
 

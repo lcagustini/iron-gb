@@ -1,5 +1,33 @@
+void mem_dump(uint16_t start, uint16_t end) {
+    //unsigned char *buf = (unsigned char*)&memory;
+    int i, j;
+    for (i = start; i <= end; i += 16) {
+        printf("%04X  ", i);
+        for (j = 0; j < 16; j++) {
+            if (i + j <= end) {
+                printf("%02x ", ram[i + j]);
+            } else {
+                printf("   ");
+            }
+            if (j == 7) {
+                printf(" ");
+            }
+        }
+        printf(" |");
+        for (j = 0; j < 16; j++) {
+            if (i + j <= end) {
+                printf("%c",
+                        isprint(ram[i + j]) ?
+                        ram[i + j] : '.');
+            }
+        }
+        printf("|\n");
+    }
+}
+
 void writeByte(uint16_t addr, uint8_t value) {
     if (addr <= 0x7FFF) return; //Can't write to ROM
+    if (addr >= 0xFEA0 && addr <= 0xFEFF) return;
 
     switch (addr) {
         case DIV:

@@ -134,7 +134,7 @@ void DMGReset(FILE *rom) {
     gpu_clock = 0;
     IME = false;
 
-    rb.f = 0xB0;
+    rb.af = 0x01B0;
     rb.bc = 0x13;
     rb.de = 0xD8;
     rb.hl = 0x14D;
@@ -193,8 +193,8 @@ int main(int argc, char* argv[]) {
 
     SDL_Surface *screen_surface = SDL_GetWindowSurface(window);
     SDL_Surface *draw_surface = SDL_CreateRGBSurface(0, 160, 144, screen_surface->format->BitsPerPixel,
-                                                     screen_surface->format->Rmask, screen_surface->format->Gmask,
-                                                     screen_surface->format->Bmask, screen_surface->format->Amask);
+            screen_surface->format->Rmask, screen_surface->format->Gmask,
+            screen_surface->format->Bmask, screen_surface->format->Amask);
 
     FILE *rom = fopen(argv[1], "rb");
     DMGReset(rom);
