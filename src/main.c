@@ -42,6 +42,7 @@
 #define SCX 0xFF43
 #define LY 0xFF44
 #define LYC 0xFF45
+#define DMA 0xFF46
 #define BGP 0xFF47
 #define OBP0 0xFF48
 #define OBP1 0xFF49
@@ -233,6 +234,8 @@ int main(int argc, char* argv[]) {
                     gpu_clock = 0;
                     ram[STAT] &= ~0b11;
                     ram[STAT] |= 0b11;
+
+                    if (ram[STAT] & 0b100000) ram[IF] |= 0b10;
                 }
                 break;
                 //VRAM Access
@@ -244,9 +247,10 @@ int main(int argc, char* argv[]) {
                     if (ram[STAT] & 0b1000) ram[IF] |= 0b10;
 
                     // Render a line
+                    // TODO: Sprite priority and flips
                     uint8_t y = ram[LY];
-                    if (ram[LCDC] & 0b1) {
-                        for (int x = 0; x < 160; x++) {
+                    for (int x = 0; x < 160; x++) {
+                        if (ram[LCDC] & 0b1) {
                             uint8_t sx = x + ram[SCX];
                             if (sx > 160) sx = 160;
                             uint8_t sy = y + ram[SCY];
@@ -264,6 +268,38 @@ int main(int argc, char* argv[]) {
 
                             Uint32 *pixels = (Uint32 *)draw_surface->pixels;
                             pixels[(y*draw_surface->w) + x] = color;
+                        }
+                        if (ram[LCDC] & 0b10) {
+                            for (int s = 0; s < 40; s++) {
+                                uint8_t sy = ram[0xFE00 + 4*s] - 16;
+                                uint8_t sx = ram[0xFE00 + 4*s + 1] - 8;
+                                if (y >= sy && y < sy + 8 &&
+                                    x >= sx && x < sx + 8) {
+                                    uint8_t tx = x - sx;
+                                    uint8_t ty = y - sy;
+
+                                    if (ram[0xFE00 + 4*s + 3] & 0b100000) {
+                                        tx = 7 - tx;
+                                    }
+                                    if (ram[0xFE00 + 4*s + 3] & 0b1000000) {
+                                        ty = 7 - ty;
+                                    }
+
+                                    uint8_t tile = ram[0xFE00 + 4*s + 2];
+
+                                    uint8_t low = ram[0x8000 + tile*16 + 2*(ty % 8)];
+                                    uint8_t high = ram[0x8001 + tile*16 + 2*(ty % 8)];
+
+                                    uint8_t pixel = (((low << tx) & 0xFF) >> 7) | ((((high << tx) & 0xFF) >> 7) << 1);
+                                    if (pixel) {
+                                        uint8_t palette = (ram[0xFE00 + 4*s + 3] & 0b10000) ? ram[OBP1] : ram[OBP0];
+                                        uint32_t color = 0xFFFFFF - (((palette >> (2*pixel)) & 0b11) * 5592405);
+
+                                        Uint32 *pixels = (Uint32 *)draw_surface->pixels;
+                                        pixels[(y*draw_surface->w) + x] = color;
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -291,7 +327,7 @@ int main(int argc, char* argv[]) {
                     else {
                         ram[STAT] |= 0b10;
 
-                        if (ram[STAT] & 0b100000) ram[IF] |= 0b10;
+                        if (ram[STAT] & 0b1000) ram[IF] |= 0b10;
                     }
                 }
                 break;
@@ -305,7 +341,7 @@ int main(int argc, char* argv[]) {
                         ram[STAT] &= ~0b11;
                         ram[STAT] |= 0b10;
 
-                        if (ram[STAT] & 0b100000) ram[IF] |= 0b10;
+                        if (ram[STAT] & 0b10000) ram[IF] |= 0b10;
 
                         ram[LY] = 0;
                     }

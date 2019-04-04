@@ -1,5 +1,4 @@
 void mem_dump(uint16_t start, uint16_t end) {
-    //unsigned char *buf = (unsigned char*)&memory;
     int i, j;
     for (i = start; i <= end; i += 16) {
         printf("%04X  ", i);
@@ -25,6 +24,13 @@ void mem_dump(uint16_t start, uint16_t end) {
     }
 }
 
+void DMATransfer() {
+    uint16_t source = ram[DMA] * 0x100;
+    for (int i = 0; i < 0xA0; i++) {
+        ram[0xFE00 + i] = ram[source + i];
+    }
+}
+
 void writeByte(uint16_t addr, uint8_t value) {
     if (addr <= 0x7FFF) return; //Can't write to ROM
     if (addr >= 0xFEA0 && addr <= 0xFEFF) return;
@@ -37,6 +43,8 @@ void writeByte(uint16_t addr, uint8_t value) {
         default:
             ram[addr] = value;
     }
+
+    if (addr == DMA) DMATransfer();
 
     if (addr >= 0xE000 && addr < 0xFE00) {
         ram[addr-0x2000] = value;
@@ -58,6 +66,18 @@ void handleInterrupts() {
         writeByte(rb.sp -1, (rb.pc & 0xFF00) >> 8);
         writeByte(rb.sp -2, (rb.pc & 0xFF));
         rb.pc = 0x40;
+        rb.sp -= 2;
+
+        time = 20;
+    }
+
+    if ((ram[IE] & 0b10) && (ram[IF] & 0b10)) {
+        IME = false;
+        ram[IF] &= ~0b10;
+
+        writeByte(rb.sp -1, (rb.pc & 0xFF00) >> 8);
+        writeByte(rb.sp -2, (rb.pc & 0xFF));
+        rb.pc = 0x48;
         rb.sp -= 2;
 
         time = 20;
