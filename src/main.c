@@ -102,6 +102,7 @@ struct {
 } rb;
 uint64_t cpu_clock;
 uint64_t gpu_clock;
+uint8_t cartridge_type;
 uint8_t ram[0x10000];
 bool IME;
 enum {
@@ -216,6 +217,7 @@ void printHeader(FILE *rom) {
 
     fseek(rom, 0x0147, SEEK_SET);
     fread(buffer, 1, 1, rom);
+    cartridge_type = buffer[0];
     printf("Cartridge Type: ");
     switch (buffer[0]) {
         case 0x00:
@@ -466,7 +468,7 @@ int main(int argc, char* argv[]) {
                             SDL_FillRect(draw_surface, NULL, 0xFFFFFF);
                         }
                         SDL_BlitScaled(draw_surface, NULL, screen_surface, NULL);
-#if SHOW_TILESET
+#ifdef SHOW_TILESET
                         for (int tile = 0; tile < 384; tile++) {
                             int tx = 8*(tile % (ZOOM*20));
                             int ty = 8*(tile / (ZOOM*20));
