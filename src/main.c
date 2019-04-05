@@ -177,6 +177,162 @@ void DMGReset(FILE *rom) {
     ram[IE] = 0x00;
 }
 
+uint8_t drawBG(SDL_Surface *draw_surface, uint8_t x, uint8_t y) {
+    if (ram[LCDC] & 0b1) {
+        uint8_t sx = x + ram[SCX];
+        if (sx > 160) sx = 160;
+        uint8_t sy = y + ram[SCY];
+        if (sy > 144) sy = 144;
+
+        uint64_t i = 32*(sy/8) + sx/8;
+        uint8_t tile = ram[(ram[LCDC] & 0b1000 ? 0x9C00 : 0x9800) + i];
+        uint8_t tileset = ram[LCDC] & 0b10000;
+        if (!tileset) {
+            tile += 128;
+        }
+
+        uint8_t low = ram[(tileset ? 0x8000 : 0x8800) + tile*16 + 2*(sy % 8)];
+        uint8_t high = ram[(tileset ? 0x8001 : 0x8801) + tile*16 + 2*(sy % 8)];
+
+        uint8_t tx = sx % 8;
+        uint8_t pixel = (((low << tx) & 0xFF) >> 7) | ((((high << tx) & 0xFF) >> 7) << 1);
+        uint32_t color = 0xFFFFFF - (((ram[BGP] >> (2*pixel)) & 0b11) * 5592405);
+
+        uint32_t *pixels = (uint32_t *)draw_surface->pixels;
+        pixels[(y*draw_surface->w) + x] = color;
+
+        return pixel;
+    }
+    return -1;
+}
+
+void printHeader(FILE *rom) {
+    fseek(rom, 0x0134, SEEK_SET);
+
+    unsigned char buffer[20] = {0};
+    fread(buffer, 16, 1, rom);
+
+    printf("ROM Loaded: %s\n", buffer);
+
+    fseek(rom, 0x0147, SEEK_SET);
+    fread(buffer, 1, 1, rom);
+    printf("Cartridge Type: ");
+    switch (buffer[0]) {
+        case 0x00:
+            printf("ROM Only");
+            break;
+        case 0x01:
+            printf("MBC1");
+            break;
+        case 0x02:
+            printf("MBC1 + RAM");
+            break;
+        case 0x03:
+            printf("MBC1 + RAM + Battery");
+            break;
+        case 0x05:
+            printf("MBC2");
+            break;
+        case 0x06:
+            printf("MBC2 + RAM + Battery");
+            break;
+        case 0x08:
+            printf("ROM + RAM");
+            break;
+        case 0x09:
+            printf("ROM + RAM + Battery");
+            break;
+        case 0x0B:
+            printf("MMM01");
+            break;
+        case 0x0C:
+            printf("MMM01 + RAM");
+            break;
+        case 0x0D:
+            printf("MMM01 + RAM + Battery");
+            break;
+        case 0x0F:
+            printf("MBC3 + Timer + Battery");
+            break;
+        case 0x10:
+            printf("MBC3 + RAM + Timer + Battery");
+            break;
+        case 0x11:
+            printf("MBC3");
+            break;
+        case 0x12:
+            printf("MBC3 + RAM");
+            break;
+        case 0x13:
+            printf("MBC3 + RAM + Battery");
+            break;
+        case 0x19:
+            printf("MBC5");
+            break;
+        case 0x1A:
+            printf("MBC5 + RAM");
+            break;
+        case 0x1B:
+            printf("MBC5 + RAM + Battery");
+            break;
+        case 0x1C:
+            printf("MBC5 + Rumble");
+            break;
+        case 0x1D:
+            printf("MBC5 + RAM + Rumble");
+            break;
+        case 0x1E:
+            printf("MBC5 + RAM + Battery + Rumble");
+            break;
+        case 0x20:
+            printf("MBC6 + RAM + Battery");
+            break;
+        case 0x22:
+            printf("MBC7 + RAM + Bat. + Accelerometer");
+            break;
+        case 0xFC:
+            printf("POCKET CAMERA");
+            break;
+        case 0xFD:
+            printf("BANDAI TAMA5");
+            break;
+        case 0xFE:
+            printf("HuC3");
+            break;
+        case 0xFF:
+            printf("HuC1 + RAM + Battery");
+            break;
+        default:
+            printf("Unknown");
+    }
+    printf("\n");
+
+    fread(buffer, 2, 1, rom);
+    int ram_size;
+    switch (buffer[2]) {
+        case 1:
+            ram_size = 2;
+            break;
+        case 2:
+            ram_size = 8;
+            break;
+        case 3:
+            ram_size = 32;
+            break;
+        case 4:
+            ram_size = 128;
+            break;
+        case 5:
+            ram_size = 64;
+            break;
+        default:
+            ram_size = 0;
+    }
+    printf("ROM Size: %dKB - RAM Size: %dKB\n", 32 << buffer[1], ram_size);
+
+    rewind(rom);
+}
+
 int main(int argc, char* argv[]) {
     SDL_Window *window = NULL;
 
@@ -198,6 +354,7 @@ int main(int argc, char* argv[]) {
             screen_surface->format->Bmask, screen_surface->format->Amask);
 
     FILE *rom = fopen(argv[1], "rb");
+    printHeader(rom);
     DMGReset(rom);
 
     SDL_Event e;
@@ -247,38 +404,21 @@ int main(int argc, char* argv[]) {
                     if (ram[STAT] & 0b1000) ram[IF] |= 0b10;
 
                     // Render a line
-                    // TODO: Sprite priority and flips
                     uint8_t y = ram[LY];
-                    for (int x = 0; x < 160; x++) {
-                        if (ram[LCDC] & 0b1) {
-                            uint8_t sx = x + ram[SCX];
-                            if (sx > 160) sx = 160;
-                            uint8_t sy = y + ram[SCY];
-                            if (sy > 144) sy = 144;
-
-                            uint64_t i = 32*(sy/8) + sx/8;
-                            uint8_t tile = ram[(ram[LCDC] & 0b1000 ? 0x9C00 : 0x9800) + i];
-                            uint8_t tileset = ram[LCDC] & 0b10000;
-                            if (!tileset) {
-                                tile += 128;
-                            }
-
-                            uint8_t low = ram[(tileset ? 0x8000 : 0x8800) + tile*16 + 2*(sy % 8)];
-                            uint8_t high = ram[(tileset ? 0x8001 : 0x8801) + tile*16 + 2*(sy % 8)];
-
-                            uint8_t tx = sx % 8;
-                            uint8_t pixel = (((low << tx) & 0xFF) >> 7) | ((((high << tx) & 0xFF) >> 7) << 1);
-                            uint32_t color = 0xFFFFFF - (((ram[BGP] >> (2*pixel)) & 0b11) * 5592405);
-
-                            Uint32 *pixels = (Uint32 *)draw_surface->pixels;
-                            pixels[(y*draw_surface->w) + x] = color;
-                        }
+                    for (uint8_t x = 0; x < 160; x++) {
+                        drawBG(draw_surface, x, y);
                         if (ram[LCDC] & 0b10) {
                             for (int s = 0; s < 40; s++) {
                                 uint8_t sy = ram[0xFE00 + 4*s] - 16;
                                 uint8_t sx = ram[0xFE00 + 4*s + 1] - 8;
                                 if (y >= sy && y < sy + 8 &&
-                                    x >= sx && x < sx + 8) {
+                                        x >= sx && x < sx + 8) {
+                                    if (ram[0xFE00 + 4*s + 3] & 0b10000000) {
+                                        if (drawBG(draw_surface, x, y)) {
+                                            break;
+                                        }
+                                    }
+
                                     uint8_t tx = x - sx;
                                     uint8_t ty = y - sy;
 
@@ -302,6 +442,8 @@ int main(int argc, char* argv[]) {
                                         Uint32 *pixels = (Uint32 *)draw_surface->pixels;
                                         pixels[(y*draw_surface->w) + x] = color;
                                     }
+
+                                    break;
                                 }
                             }
                         }

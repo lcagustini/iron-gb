@@ -40,11 +40,13 @@ void writeByte(uint16_t addr, uint8_t value) {
         case LY:
             ram[addr] = 0;
             break;
+        case DMA:
+            ram[addr] = value;
+            DMATransfer();
+            break;
         default:
             ram[addr] = value;
     }
-
-    if (addr == DMA) DMATransfer();
 
     if (addr >= 0xE000 && addr < 0xFE00) {
         ram[addr-0x2000] = value;
