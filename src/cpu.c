@@ -4427,6 +4427,21 @@ void nextInstruction() {
                             time = 8;
                         }
                         break;
+                    case 0x42:
+                        {
+                            if (rb.d & 0b1) rb.f &= 0b01111111;
+                            else rb.f |= 0b10000000;
+                            rb.f &= 0b10111111;
+                            rb.f |= 0b00100000;
+
+                            if (debug) {
+                                printf("BIT 0, D");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
                     case 0x43:
                         {
                             if (rb.e & 0b1) rb.f &= 0b01111111;
@@ -4436,6 +4451,36 @@ void nextInstruction() {
 
                             if (debug) {
                                 printf("BIT 0, E");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0x44:
+                        {
+                            if (rb.h & 0b1) rb.f &= 0b01111111;
+                            else rb.f |= 0b10000000;
+                            rb.f &= 0b10111111;
+                            rb.f |= 0b00100000;
+
+                            if (debug) {
+                                printf("BIT 0, H");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0x45:
+                        {
+                            if (rb.l & 0b1) rb.f &= 0b01111111;
+                            else rb.f |= 0b10000000;
+                            rb.f &= 0b10111111;
+                            rb.f |= 0b00100000;
+
+                            if (debug) {
+                                printf("BIT 0, L");
                             }
                             rb.pc++;
 
@@ -4472,6 +4517,36 @@ void nextInstruction() {
                             time = 8;
                         }
                         break;
+                    case 0x49:
+                        {
+                            if (rb.c & 0b10) rb.f &= 0b01111111;
+                            else rb.f |= 0b10000000;
+                            rb.f &= 0b10111111;
+                            rb.f |= 0b00100000;
+
+                            if (debug) {
+                                printf("BIT 1, C");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0x4A:
+                        {
+                            if (rb.d & 0b10) rb.f &= 0b01111111;
+                            else rb.f |= 0b10000000;
+                            rb.f &= 0b10111111;
+                            rb.f |= 0b00100000;
+
+                            if (debug) {
+                                printf("BIT 1, D");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
                     case 0x4B:
                         {
                             if (rb.e & 0b10) rb.f &= 0b01111111;
@@ -4481,6 +4556,36 @@ void nextInstruction() {
 
                             if (debug) {
                                 printf("BIT 1, E");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0x4C:
+                        {
+                            if (rb.h & 0b10) rb.f &= 0b01111111;
+                            else rb.f |= 0b10000000;
+                            rb.f &= 0b10111111;
+                            rb.f |= 0b00100000;
+
+                            if (debug) {
+                                printf("BIT 1, H");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0x4D:
+                        {
+                            if (rb.l & 0b10) rb.f &= 0b01111111;
+                            else rb.f |= 0b10000000;
+                            rb.f &= 0b10111111;
+                            rb.f |= 0b00100000;
+
+                            if (debug) {
+                                printf("BIT 1, L");
                             }
                             rb.pc++;
 
@@ -4517,6 +4622,36 @@ void nextInstruction() {
                             time = 8;
                         }
                         break;
+                    case 0x51:
+                        {
+                            if (rb.c & 0b100) rb.f &= 0b01111111;
+                            else rb.f |= 0b10000000;
+                            rb.f &= 0b10111111;
+                            rb.f |= 0b00100000;
+
+                            if (debug) {
+                                printf("BIT 2, C");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0x52:
+                        {
+                            if (rb.d & 0b100) rb.f &= 0b01111111;
+                            else rb.f |= 0b10000000;
+                            rb.f &= 0b10111111;
+                            rb.f |= 0b00100000;
+
+                            if (debug) {
+                                printf("BIT 2, D");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
                     case 0x53:
                         {
                             if (rb.e & 0b100) rb.f &= 0b01111111;
@@ -4526,6 +4661,36 @@ void nextInstruction() {
 
                             if (debug) {
                                 printf("BIT 2, E");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0x54:
+                        {
+                            if (rb.h & 0b100) rb.f &= 0b01111111;
+                            else rb.f |= 0b10000000;
+                            rb.f &= 0b10111111;
+                            rb.f |= 0b00100000;
+
+                            if (debug) {
+                                printf("BIT 2, H");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0x55:
+                        {
+                            if (rb.l & 0b100) rb.f &= 0b01111111;
+                            else rb.f |= 0b10000000;
+                            rb.f &= 0b10111111;
+                            rb.f |= 0b00100000;
+
+                            if (debug) {
+                                printf("BIT 2, L");
                             }
                             rb.pc++;
 
@@ -4562,6 +4727,36 @@ void nextInstruction() {
                             time = 8;
                         }
                         break;
+                    case 0x59:
+                        {
+                            if (rb.c & 0b1000) rb.f &= 0b01111111;
+                            else rb.f |= 0b10000000;
+                            rb.f &= 0b10111111;
+                            rb.f |= 0b00100000;
+
+                            if (debug) {
+                                printf("BIT 3, C");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0x5A:
+                        {
+                            if (rb.d & 0b1000) rb.f &= 0b01111111;
+                            else rb.f |= 0b10000000;
+                            rb.f &= 0b10111111;
+                            rb.f |= 0b00100000;
+
+                            if (debug) {
+                                printf("BIT 3, D");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
                     case 0x5B:
                         {
                             if (rb.e & 0b1000) rb.f &= 0b01111111;
@@ -4571,6 +4766,36 @@ void nextInstruction() {
 
                             if (debug) {
                                 printf("BIT 3, E");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0x5C:
+                        {
+                            if (rb.h & 0b1000) rb.f &= 0b01111111;
+                            else rb.f |= 0b10000000;
+                            rb.f &= 0b10111111;
+                            rb.f |= 0b00100000;
+
+                            if (debug) {
+                                printf("BIT 3, H");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0x5D:
+                        {
+                            if (rb.l & 0b1000) rb.f &= 0b01111111;
+                            else rb.f |= 0b10000000;
+                            rb.f &= 0b10111111;
+                            rb.f |= 0b00100000;
+
+                            if (debug) {
+                                printf("BIT 3, L");
                             }
                             rb.pc++;
 
@@ -4622,6 +4847,21 @@ void nextInstruction() {
                             time = 8;
                         }
                         break;
+                    case 0x62:
+                        {
+                            if (rb.d & 0b10000) rb.f &= 0b01111111;
+                            else rb.f |= 0b10000000;
+                            rb.f &= 0b10111111;
+                            rb.f |= 0b00100000;
+
+                            if (debug) {
+                                printf("BIT 4, D");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
                     case 0x63:
                         {
                             if (rb.e & 0b10000) rb.f &= 0b01111111;
@@ -4631,6 +4871,51 @@ void nextInstruction() {
 
                             if (debug) {
                                 printf("BIT 4, E");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0x64:
+                        {
+                            if (rb.h & 0b10000) rb.f &= 0b01111111;
+                            else rb.f |= 0b10000000;
+                            rb.f &= 0b10111111;
+                            rb.f |= 0b00100000;
+
+                            if (debug) {
+                                printf("BIT 4, H");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0x65:
+                        {
+                            if (rb.l & 0b10000) rb.f &= 0b01111111;
+                            else rb.f |= 0b10000000;
+                            rb.f &= 0b10111111;
+                            rb.f |= 0b00100000;
+
+                            if (debug) {
+                                printf("BIT 4, L");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0x67:
+                        {
+                            if (rb.a & 0b10000) rb.f &= 0b01111111;
+                            else rb.f |= 0b10000000;
+                            rb.f &= 0b10111111;
+                            rb.f |= 0b00100000;
+
+                            if (debug) {
+                                printf("BIT 4, A");
                             }
                             rb.pc++;
 
@@ -4667,6 +4952,21 @@ void nextInstruction() {
                             time = 8;
                         }
                         break;
+                    case 0x6A:
+                        {
+                            if (rb.d & 0b100000) rb.f &= 0b01111111;
+                            else rb.f |= 0b10000000;
+                            rb.f &= 0b10111111;
+                            rb.f |= 0b00100000;
+
+                            if (debug) {
+                                printf("BIT 5, D");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
                     case 0x6B:
                         {
                             if (rb.e & 0b100000) rb.f &= 0b01111111;
@@ -4676,6 +4976,36 @@ void nextInstruction() {
 
                             if (debug) {
                                 printf("BIT 5, E");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0x6C:
+                        {
+                            if (rb.h & 0b100000) rb.f &= 0b01111111;
+                            else rb.f |= 0b10000000;
+                            rb.f &= 0b10111111;
+                            rb.f |= 0b00100000;
+
+                            if (debug) {
+                                printf("BIT 5, H");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0x6D:
+                        {
+                            if (rb.l & 0b100000) rb.f &= 0b01111111;
+                            else rb.f |= 0b10000000;
+                            rb.f &= 0b10111111;
+                            rb.f |= 0b00100000;
+
+                            if (debug) {
+                                printf("BIT 5, L");
                             }
                             rb.pc++;
 
@@ -4742,6 +5072,21 @@ void nextInstruction() {
                             time = 8;
                         }
                         break;
+                    case 0x72:
+                        {
+                            if (rb.d & 0b1000000) rb.f &= 0b01111111;
+                            else rb.f |= 0b10000000;
+                            rb.f &= 0b10111111;
+                            rb.f |= 0b00100000;
+
+                            if (debug) {
+                                printf("BIT 6, D");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
                     case 0x73:
                         {
                             if (rb.e & 0b1000000) rb.f &= 0b01111111;
@@ -4751,6 +5096,36 @@ void nextInstruction() {
 
                             if (debug) {
                                 printf("BIT 6, E");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0x74:
+                        {
+                            if (rb.h & 0b1000000) rb.f &= 0b01111111;
+                            else rb.f |= 0b10000000;
+                            rb.f &= 0b10111111;
+                            rb.f |= 0b00100000;
+
+                            if (debug) {
+                                printf("BIT 6, H");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0x75:
+                        {
+                            if (rb.l & 0b1000000) rb.f &= 0b01111111;
+                            else rb.f |= 0b10000000;
+                            rb.f &= 0b10111111;
+                            rb.f |= 0b00100000;
+
+                            if (debug) {
+                                printf("BIT 6, L");
                             }
                             rb.pc++;
 
@@ -4817,6 +5192,21 @@ void nextInstruction() {
                             time = 8;
                         }
                         break;
+                    case 0x7A:
+                        {
+                            if (rb.d & 0b10000000) rb.f &= 0b01111111;
+                            else rb.f |= 0b10000000;
+                            rb.f &= 0b10111111;
+                            rb.f |= 0b00100000;
+
+                            if (debug) {
+                                printf("BIT 7, D");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
                     case 0x7B:
                         {
                             if (rb.e & 0b10000000) rb.f &= 0b01111111;
@@ -4841,6 +5231,21 @@ void nextInstruction() {
 
                             if (debug) {
                                 printf("BIT 7, H");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0x7D:
+                        {
+                            if (rb.l & 0b10000000) rb.f &= 0b01111111;
+                            else rb.f |= 0b10000000;
+                            rb.f &= 0b10111111;
+                            rb.f |= 0b00100000;
+
+                            if (debug) {
+                                printf("BIT 7, L");
                             }
                             rb.pc++;
 
@@ -4877,6 +5282,78 @@ void nextInstruction() {
                             time = 8;
                         }
                         break;
+                    case 0x80:
+                        {
+                            rb.b &= ~0b1;
+
+                            if (debug) {
+                                printf("RES 0, B");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0x81:
+                        {
+                            rb.c &= ~0b1;
+
+                            if (debug) {
+                                printf("RES 0, C");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0x82:
+                        {
+                            rb.d &= ~0b1;
+
+                            if (debug) {
+                                printf("RES 0, D");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0x83:
+                        {
+                            rb.e &= ~0b1;
+
+                            if (debug) {
+                                printf("RES 0, E");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0x84:
+                        {
+                            rb.h &= ~0b1;
+
+                            if (debug) {
+                                printf("RES 0, H");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0x85:
+                        {
+                            rb.l &= ~0b1;
+
+                            if (debug) {
+                                printf("RES 0, L");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
                     case 0x86:
                         {
                             writeByte(rb.hl, ram[rb.hl] & ~0b1);
@@ -4901,6 +5378,78 @@ void nextInstruction() {
                             time = 8;
                         }
                         break;
+                    case 0x88:
+                        {
+                            rb.b &= ~0b10;
+
+                            if (debug) {
+                                printf("RES 1, B");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0x89:
+                        {
+                            rb.c &= ~0b10;
+
+                            if (debug) {
+                                printf("RES 1, C");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0x8A:
+                        {
+                            rb.d &= ~0b10;
+
+                            if (debug) {
+                                printf("RES 1, D");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0x8B:
+                        {
+                            rb.e &= ~0b10;
+
+                            if (debug) {
+                                printf("RES 1, E");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0x8C:
+                        {
+                            rb.h &= ~0b10;
+
+                            if (debug) {
+                                printf("RES 1, H");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0x8D:
+                        {
+                            rb.l &= ~0b10;
+
+                            if (debug) {
+                                printf("RES 1, L");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
                     case 0x8E:
                         {
                             writeByte(rb.hl, ram[rb.hl] & ~0b10);
@@ -4911,6 +5460,90 @@ void nextInstruction() {
                             rb.pc++;
 
                             time = 16;
+                        }
+                        break;
+                    case 0x8F:
+                        {
+                            rb.a &= ~0b10;
+
+                            if (debug) {
+                                printf("RES 1, A");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0x90:
+                        {
+                            rb.b &= ~0b100;
+
+                            if (debug) {
+                                printf("RES 2, B");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0x91:
+                        {
+                            rb.c &= ~0b100;
+
+                            if (debug) {
+                                printf("RES 2, C");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0x92:
+                        {
+                            rb.d &= ~0b100;
+
+                            if (debug) {
+                                printf("RES 2, D");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0x93:
+                        {
+                            rb.e &= ~0b100;
+
+                            if (debug) {
+                                printf("RES 2, E");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0x94:
+                        {
+                            rb.h &= ~0b100;
+
+                            if (debug) {
+                                printf("RES 2, H");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0x95:
+                        {
+                            rb.l &= ~0b100;
+
+                            if (debug) {
+                                printf("RES 2, L");
+                            }
+                            rb.pc++;
+
+                            time = 8;
                         }
                         break;
                     case 0x96:
@@ -4925,6 +5558,90 @@ void nextInstruction() {
                             time = 16;
                         }
                         break;
+                    case 0x97:
+                        {
+                            rb.a &= ~0b100;
+
+                            if (debug) {
+                                printf("RES 2, A");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0x98:
+                        {
+                            rb.b &= ~0b1000;
+
+                            if (debug) {
+                                printf("RES 3, B");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0x99:
+                        {
+                            rb.c &= ~0b1000;
+
+                            if (debug) {
+                                printf("RES 3, C");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0x9A:
+                        {
+                            rb.d &= ~0b1000;
+
+                            if (debug) {
+                                printf("RES 3, D");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0x9B:
+                        {
+                            rb.e &= ~0b1000;
+
+                            if (debug) {
+                                printf("RES 3, E");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0x9C:
+                        {
+                            rb.h &= ~0b1000;
+
+                            if (debug) {
+                                printf("RES 3, H");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0x9D:
+                        {
+                            rb.l &= ~0b1000;
+
+                            if (debug) {
+                                printf("RES 3, L");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
                     case 0x9E:
                         {
                             writeByte(rb.hl, ram[rb.hl] & ~0b1000);
@@ -4935,6 +5652,174 @@ void nextInstruction() {
                             rb.pc++;
 
                             time = 16;
+                        }
+                        break;
+                    case 0x9F:
+                        {
+                            rb.a &= ~0b1000;
+
+                            if (debug) {
+                                printf("RES 3, A");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0xA0:
+                        {
+                            rb.b &= ~0b10000;
+
+                            if (debug) {
+                                printf("RES 4, B");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0xA1:
+                        {
+                            rb.c &= ~0b10000;
+
+                            if (debug) {
+                                printf("RES 4, C");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0xA2:
+                        {
+                            rb.d &= ~0b10000;
+
+                            if (debug) {
+                                printf("RES 4, D");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0xA3:
+                        {
+                            rb.e &= ~0b10000;
+
+                            if (debug) {
+                                printf("RES 4, E");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0xA4:
+                        {
+                            rb.h &= ~0b10000;
+
+                            if (debug) {
+                                printf("RES 4, H");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0xA5:
+                        {
+                            rb.l &= ~0b10000;
+
+                            if (debug) {
+                                printf("RES 4, L");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0xA7:
+                        {
+                            rb.a &= ~0b10000;
+
+                            if (debug) {
+                                printf("RES 4, A");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0xA8:
+                        {
+                            rb.b &= ~0b100000;
+
+                            if (debug) {
+                                printf("RES 5, B");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0xA9:
+                        {
+                            rb.c &= ~0b100000;
+
+                            if (debug) {
+                                printf("RES 5, C");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0xAA:
+                        {
+                            rb.d &= ~0b100000;
+
+                            if (debug) {
+                                printf("RES 5, D");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0xAB:
+                        {
+                            rb.e &= ~0b100000;
+
+                            if (debug) {
+                                printf("RES 5, E");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0xAC:
+                        {
+                            rb.h &= ~0b100000;
+
+                            if (debug) {
+                                printf("RES 5, H");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0xAD:
+                        {
+                            rb.l &= ~0b100000;
+
+                            if (debug) {
+                                printf("RES 5, L");
+                            }
+                            rb.pc++;
+
+                            time = 8;
                         }
                         break;
                     case 0xAE:
@@ -4949,6 +5834,174 @@ void nextInstruction() {
                             time = 16;
                         }
                         break;
+                    case 0xAF:
+                        {
+                            rb.a &= ~0b100000;
+
+                            if (debug) {
+                                printf("RES 5, A");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0xB0:
+                        {
+                            rb.b &= ~0b1000000;
+
+                            if (debug) {
+                                printf("RES 6, B");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0xB1:
+                        {
+                            rb.c &= ~0b1000000;
+
+                            if (debug) {
+                                printf("RES 6, C");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0xB2:
+                        {
+                            rb.d &= ~0b1000000;
+
+                            if (debug) {
+                                printf("RES 6, D");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0xB3:
+                        {
+                            rb.e &= ~0b1000000;
+
+                            if (debug) {
+                                printf("RES 6, E");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0xB4:
+                        {
+                            rb.h &= ~0b1000000;
+
+                            if (debug) {
+                                printf("RES 6, H");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0xB5:
+                        {
+                            rb.l &= ~0b1000000;
+
+                            if (debug) {
+                                printf("RES 6, L");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0xB7:
+                        {
+                            rb.a &= ~0b1000000;
+
+                            if (debug) {
+                                printf("RES 6, A");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0xB8:
+                        {
+                            rb.b &= ~0b10000000;
+
+                            if (debug) {
+                                printf("RES 7, B");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0xB9:
+                        {
+                            rb.c &= ~0b10000000;
+
+                            if (debug) {
+                                printf("RES 7, C");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0xBA:
+                        {
+                            rb.d &= ~0b10000000;
+
+                            if (debug) {
+                                printf("RES 7, D");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0xBB:
+                        {
+                            rb.e &= ~0b10000000;
+
+                            if (debug) {
+                                printf("RES 7, E");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0xBC:
+                        {
+                            rb.h &= ~0b10000000;
+
+                            if (debug) {
+                                printf("RES 7, H");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0xBD:
+                        {
+                            rb.l &= ~0b10000000;
+
+                            if (debug) {
+                                printf("RES 7, L");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
                     case 0xBE:
                         {
                             writeByte(rb.hl, ram[rb.hl] & ~0b10000000);
@@ -4959,6 +6012,90 @@ void nextInstruction() {
                             rb.pc++;
 
                             time = 16;
+                        }
+                        break;
+                    case 0xBF:
+                        {
+                            rb.a &= ~0b10000000;
+
+                            if (debug) {
+                                printf("RES 7, A");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0xC0:
+                        {
+                            rb.b |= 0b1;
+
+                            if (debug) {
+                                printf("SET 0, B");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0xC1:
+                        {
+                            rb.c |= 0b1;
+
+                            if (debug) {
+                                printf("SET 0, C");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0xC2:
+                        {
+                            rb.d |= 0b1;
+
+                            if (debug) {
+                                printf("SET 0, D");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0xC3:
+                        {
+                            rb.e |= 0b1;
+
+                            if (debug) {
+                                printf("SET 0, E");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0xC4:
+                        {
+                            rb.h |= 0b1;
+
+                            if (debug) {
+                                printf("SET 0, H");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0xC5:
+                        {
+                            rb.l |= 0b1;
+
+                            if (debug) {
+                                printf("SET 0, L");
+                            }
+                            rb.pc++;
+
+                            time = 8;
                         }
                         break;
                     case 0xC6:
@@ -4979,6 +6116,78 @@ void nextInstruction() {
 
                             if (debug) {
                                 printf("SET 0, A");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0xC8:
+                        {
+                            rb.b |= 0b10;
+
+                            if (debug) {
+                                printf("SET 1, B");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0xC9:
+                        {
+                            rb.c |= 0b10;
+
+                            if (debug) {
+                                printf("SET 1, C");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0xCA:
+                        {
+                            rb.d |= 0b10;
+
+                            if (debug) {
+                                printf("SET 1, D");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0xCB:
+                        {
+                            rb.e |= 0b10;
+
+                            if (debug) {
+                                printf("SET 1, E");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0xCC:
+                        {
+                            rb.h |= 0b10;
+
+                            if (debug) {
+                                printf("SET 1, H");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0xCD:
+                        {
+                            rb.l |= 0b10;
+
+                            if (debug) {
+                                printf("SET 1, L");
                             }
                             rb.pc++;
 
@@ -5009,6 +6218,78 @@ void nextInstruction() {
                             time = 8;
                         }
                         break;
+                    case 0xD0:
+                        {
+                            rb.b |= 0b100;
+
+                            if (debug) {
+                                printf("SET 2, B");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0xD1:
+                        {
+                            rb.c |= 0b100;
+
+                            if (debug) {
+                                printf("SET 2, C");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0xD2:
+                        {
+                            rb.d |= 0b100;
+
+                            if (debug) {
+                                printf("SET 2, D");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0xD3:
+                        {
+                            rb.e |= 0b100;
+
+                            if (debug) {
+                                printf("SET 2, E");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0xD4:
+                        {
+                            rb.h |= 0b100;
+
+                            if (debug) {
+                                printf("SET 2, H");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0xD5:
+                        {
+                            rb.l |= 0b100;
+
+                            if (debug) {
+                                printf("SET 2, L");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
                     case 0xD6:
                         {
                             writeByte(rb.hl, ram[rb.hl] | 0b100);
@@ -5033,6 +6314,78 @@ void nextInstruction() {
                             time = 8;
                         }
                         break;
+                    case 0xD8:
+                        {
+                            rb.b |= 0b1000;
+
+                            if (debug) {
+                                printf("SET 3, B");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0xD9:
+                        {
+                            rb.c |= 0b1000;
+
+                            if (debug) {
+                                printf("SET 3, C");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0xDA:
+                        {
+                            rb.d |= 0b1000;
+
+                            if (debug) {
+                                printf("SET 3, D");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0xDB:
+                        {
+                            rb.e |= 0b1000;
+
+                            if (debug) {
+                                printf("SET 3, E");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0xDC:
+                        {
+                            rb.h |= 0b1000;
+
+                            if (debug) {
+                                printf("SET 3, H");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0xDD:
+                        {
+                            rb.l |= 0b1000;
+
+                            if (debug) {
+                                printf("SET 3, L");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
                     case 0xDE:
                         {
                             writeByte(rb.hl, ram[rb.hl] | 0b1000);
@@ -5045,6 +6398,90 @@ void nextInstruction() {
                             time = 16;
                         }
                         break;
+                    case 0xDF:
+                        {
+                            rb.a |= 0b1000;
+
+                            if (debug) {
+                                printf("SET 3, A");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0xE0:
+                        {
+                            rb.b |= 0b10000;
+
+                            if (debug) {
+                                printf("SET 4, B");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0xE1:
+                        {
+                            rb.c |= 0b10000;
+
+                            if (debug) {
+                                printf("SET 4, C");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0xE2:
+                        {
+                            rb.d |= 0b10000;
+
+                            if (debug) {
+                                printf("SET 4, D");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0xE3:
+                        {
+                            rb.e |= 0b10000;
+
+                            if (debug) {
+                                printf("SET 4, E");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0xE4:
+                        {
+                            rb.h |= 0b10000;
+
+                            if (debug) {
+                                printf("SET 4, H");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0xE5:
+                        {
+                            rb.l |= 0b10000;
+
+                            if (debug) {
+                                printf("SET 4, L");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
                     case 0xE6:
                         {
                             writeByte(rb.hl, ram[rb.hl] | 0b10000);
@@ -5055,6 +6492,90 @@ void nextInstruction() {
                             rb.pc++;
 
                             time = 16;
+                        }
+                        break;
+                    case 0xE7:
+                        {
+                            rb.a |= 0b10000;
+
+                            if (debug) {
+                                printf("SET 4, A");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0xE8:
+                        {
+                            rb.b |= 0b100000;
+
+                            if (debug) {
+                                printf("SET 5, B");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0xE9:
+                        {
+                            rb.c |= 0b100000;
+
+                            if (debug) {
+                                printf("SET 5, C");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0xEA:
+                        {
+                            rb.d |= 0b100000;
+
+                            if (debug) {
+                                printf("SET 5, D");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0xEB:
+                        {
+                            rb.e |= 0b100000;
+
+                            if (debug) {
+                                printf("SET 5, E");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0xEC:
+                        {
+                            rb.h |= 0b100000;
+
+                            if (debug) {
+                                printf("SET 5, H");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0xED:
+                        {
+                            rb.l |= 0b100000;
+
+                            if (debug) {
+                                printf("SET 5, L");
+                            }
+                            rb.pc++;
+
+                            time = 8;
                         }
                         break;
                     case 0xEE:
@@ -5081,12 +6602,156 @@ void nextInstruction() {
                             time = 8;
                         }
                         break;
+                    case 0xF0:
+                        {
+                            rb.b |= 0b1000000;
+
+                            if (debug) {
+                                printf("SET 6, B");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0xF1:
+                        {
+                            rb.c |= 0b1000000;
+
+                            if (debug) {
+                                printf("SET 6, C");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0xF2:
+                        {
+                            rb.d |= 0b1000000;
+
+                            if (debug) {
+                                printf("SET 6, D");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0xF3:
+                        {
+                            rb.e |= 0b1000000;
+
+                            if (debug) {
+                                printf("SET 6, E");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0xF4:
+                        {
+                            rb.h |= 0b1000000;
+
+                            if (debug) {
+                                printf("SET 6, H");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0xF5:
+                        {
+                            rb.l |= 0b1000000;
+
+                            if (debug) {
+                                printf("SET 6, L");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
                     case 0xF7:
                         {
                             rb.a = rb.a | 0b1000000;
 
                             if (debug) {
                                 printf("SET 6, A");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0xF8:
+                        {
+                            rb.b |= 0b10000000;
+
+                            if (debug) {
+                                printf("SET 7, B");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0xF9:
+                        {
+                            rb.c |= 0b10000000;
+
+                            if (debug) {
+                                printf("SET 7, C");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0xFA:
+                        {
+                            rb.d |= 0b10000000;
+
+                            if (debug) {
+                                printf("SET 7, D");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0xFB:
+                        {
+                            rb.e |= 0b10000000;
+
+                            if (debug) {
+                                printf("SET 7, E");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0xFC:
+                        {
+                            rb.h |= 0b10000000;
+
+                            if (debug) {
+                                printf("SET 7, H");
+                            }
+                            rb.pc++;
+
+                            time = 8;
+                        }
+                        break;
+                    case 0xFD:
+                        {
+                            rb.l |= 0b10000000;
+
+                            if (debug) {
+                                printf("SET 7, L");
                             }
                             rb.pc++;
 

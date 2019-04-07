@@ -468,7 +468,7 @@ int main(int argc, char* argv[]) {
                             SDL_FillRect(draw_surface, NULL, 0xFFFFFF);
                         }
                         SDL_BlitScaled(draw_surface, NULL, screen_surface, NULL);
-#ifdef SHOW_TILESET
+#if SHOW_TILESET
                         for (int tile = 0; tile < 384; tile++) {
                             int tx = 8*(tile % (ZOOM*20));
                             int ty = 8*(tile / (ZOOM*20));
