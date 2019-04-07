@@ -32,7 +32,7 @@ void DMATransfer() {
 }
 
 void writeByte(uint16_t addr, uint8_t value) {
-    if (addr <= 0x7FFF) return; //Can't write to ROM
+    if (addr <= 0x7FFF) return; //Can't write to ROM (no banking support yet)
     if (addr >= 0xFEA0 && addr <= 0xFEFF) return;
 
     switch (addr) {
@@ -166,7 +166,11 @@ void getInput() {
 }
 
 void updateRegisters() {
-    ram[DIV] += cpu_clock % 293339;
+    static uint64_t last_clock = 0;
+    if (cpu_clock - last_clock >= 256) {
+        ram[DIV]++;
+        last_clock += 256;
+    }
 
     if (ram[LYC] == ram[LY]) {
         ram[STAT] |= 0b100;
@@ -176,30 +180,34 @@ void updateRegisters() {
         ram[STAT] &= ~0b100;
     }
 
-    if (ram[TAC] & 0b100) {
-        int rate = ram[TAC] & 0b11;
+    int rate = ram[TAC] & 0b11;
 
-        switch (rate) {
-            case 0:
-                rate = cpu_clock % 4096 ? 0 : 1;
-                break;
-            case 1:
-                rate = cpu_clock % 262144 ? 0 : 1;
-                break;
-            case 2:
-                rate = cpu_clock % 65536 ? 0 : 1;
-                break;
-            case 3:
-                rate = cpu_clock % 16384 ? 0 : 1;
-                break;
-        }
+    static bool last_test_bit = true;
+    switch (rate) {
+        case 0:
+            rate = ram[DIV] & 0b10;
+            break;
+        case 1:
+            rate = ram[DIV] & 0b10000000;
+            break;
+        case 2:
+            rate = ram[DIV] & 0b100000;
+            break;
+        case 3:
+            rate = ram[DIV] & 0b1000;
+            break;
+    }
 
-        ram[TIMA] += rate;
+    bool test_bit = rate && (ram[TAC] & 0b100);
 
-        if (ram[TIMA] == 0) {
-            ram[TIMA] = ram[TMA];
+    if (last_test_bit && !test_bit) {
+        ram[TIMA]++;
+    }
+    last_test_bit = test_bit;
 
-            ram[IF] |= 0b100;
-        }
+    if (ram[TIMA] == 0) {
+        ram[TIMA] = ram[TMA];
+
+        ram[IF] |= 0b100;
     }
 }
