@@ -2462,6 +2462,29 @@ void nextInstruction() {
                 time = 4;
             }
             break;
+        case 0x9E:
+            {
+                uint8_t carry = ((rb.f >> 4) & 1);
+
+                if ((int)(rb.a & 0xF) - (int)(ram[rb.hl] & 0xF) - (int)carry < 0) rb.f |= 0b00100000;
+                else rb.f &= ~0b00100000;
+                if ((int)(rb.a & 0xFF) - (int)(ram[rb.hl] & 0xFF) - (int)carry < 0) rb.f |= 0b00010000;
+                else rb.f &= ~0b00010000;
+
+                rb.a = rb.a - ram[rb.hl] - carry;
+
+                if (rb.a == 0) rb.f |= 0b10000000;
+                else rb.f &= 0b01111111;
+                rb.f |= 0b01000000;
+
+                if (debug) {
+                    printf("SBC A, (HL)");
+                }
+                rb.pc++;
+
+                time = 8;
+            }
+            break;
         case 0x9F:
             {
                 uint8_t carry = ((rb.f >> 4) & 1);
@@ -3070,13 +3093,14 @@ void nextInstruction() {
                     time = 16;
                 }
                 else {
+                    rb.pc += 3;
+
                     time = 12;
                 }
 
                 if (debug) {
                     printf("JP NZ, 0x%04X", addr);
                 }
-                rb.pc += 3;
             }
             break;
         case 0xC3:
@@ -3352,6 +3376,28 @@ void nextInstruction() {
                             time = 8;
                         }
                         break;
+                    case 0x06:
+                        {
+                            bool carry = ram[rb.hl] & 0b10000000;
+
+                            writeByte(rb.hl, ram[rb.hl] << 1);
+                            writeByte(rb.hl, ram[rb.hl] | (carry >> 7));
+
+                            if (carry) rb.f |= 0b00010000;
+                            else rb.f &= 0b11101111;
+                            if (ram[rb.hl] == 0) rb.f |= 0b10000000;
+                            else rb.f &= 0b01111111;
+                            rb.f &= 0b10011111;
+
+                            if (debug) {
+                                printf("RLC (HL)");
+                            }
+
+                            rb.pc++;
+
+                            time = 16;
+                        }
+                        break;
                     case 0x07:
                         {
                             bool carry = rb.a & 0b10000000;
@@ -3498,6 +3544,28 @@ void nextInstruction() {
                             rb.pc++;
 
                             time = 8;
+                        }
+                        break;
+                    case 0x0E:
+                        {
+                            bool carry = ram[rb.hl] & 0b1;
+
+                            writeByte(rb.hl, ram[rb.hl] >> 1);
+                            writeByte(rb.hl, ram[rb.hl] | (carry << 7));
+
+                            if (carry) rb.f |= 0b00010000;
+                            else rb.f &= 0b11101111;
+                            if (ram[rb.hl] == 0) rb.f |= 0b10000000;
+                            else rb.f &= 0b01111111;
+                            rb.f &= 0b10011111;
+
+                            if (debug) {
+                                printf("RRC (HL)");
+                            }
+
+                            rb.pc++;
+
+                            time = 16;
                         }
                         break;
                     case 0x0F:
@@ -3647,6 +3715,28 @@ void nextInstruction() {
                             time = 8;
                         }
                         break;
+                    case 0x16:
+                        {
+                            bool carry = ram[rb.hl] & 0b10000000;
+
+                            writeByte(rb.hl, ram[rb.hl] << 1);
+                            writeByte(rb.hl, ram[rb.hl] | ((rb.f >> 4) & 1));
+
+                            if (carry) rb.f |= 0b00010000;
+                            else rb.f &= 0b11101111;
+
+                            if (ram[rb.hl] == 0) rb.f |= 0b10000000;
+                            else rb.f &= 0b01111111;
+                            rb.f &= 0b10011111;
+
+                            if (debug) {
+                                printf("RL (HL)");
+                            }
+                            rb.pc++;
+
+                            time = 16;
+                        }
+                        break;
                     case 0x17:
                         {
                             bool carry = rb.a & 0b10000000;
@@ -3792,6 +3882,27 @@ void nextInstruction() {
                             rb.pc++;
 
                             time = 8;
+                        }
+                        break;
+                    case 0x1E:
+                        {
+                            bool carry = ram[rb.hl] & 0b1;
+
+                            writeByte(rb.hl, ram[rb.hl]  >> 1);
+                            writeByte(rb.hl, ram[rb.hl]  | (((rb.f >> 4) & 1) << 7));
+                            if (carry) rb.f |= 0b00010000;
+                            else rb.f &= 0b11101111;
+
+                            if (ram[rb.hl]  == 0) rb.f |= 0b10000000;
+                            else rb.f &= 0b01111111;
+                            rb.f &= 0b10011111;
+
+                            if (debug) {
+                                printf("RR (HL)");
+                            }
+                            rb.pc++;
+
+                            time = 16;
                         }
                         break;
                     case 0x1F:
@@ -4116,6 +4227,29 @@ void nextInstruction() {
                             time = 8;
                         }
                         break;
+                    case 0x2E:
+                        {
+                            bool carry = ram[rb.hl] & 0b1;
+
+                            writeByte(rb.hl, ram[rb.hl] >> 1);
+
+                            if (carry) rb.f |= 0b00010000;
+                            else rb.f &= 0b11101111;
+                            writeByte(rb.hl, ram[rb.hl] | ((ram[rb.hl] & 0b01000000) << 1));
+
+                            if (ram[rb.hl] == 0) rb.f |= 0b10000000;
+                            else rb.f &= 0b01111111;
+                            rb.f &= 0b10011111;
+
+                            if (debug) {
+                                printf("SRA (HL)");
+                            }
+
+                            rb.pc++;
+
+                            time = 16;
+                        }
+                        break;
                     case 0x2F:
                         {
                             bool carry = rb.a & 0b1;
@@ -4232,6 +4366,22 @@ void nextInstruction() {
                             rb.pc++;
 
                             time = 8;
+                        }
+                        break;
+                    case 0x36:
+                        {
+                            writeByte(rb.hl, (ram[rb.hl] >> 4) | (ram[rb.hl] << 4));
+
+                            if (ram[rb.hl] == 0) rb.f |= 0b10000000;
+                            else rb.f &= 0b01111111;
+                            rb.f &= 0b10001111;
+
+                            if (debug) {
+                                printf("SWAP (HL)");
+                            }
+                            rb.pc++;
+
+                            time = 16;
                         }
                         break;
                     case 0x37:
@@ -4376,6 +4526,28 @@ void nextInstruction() {
                             time = 8;
                         }
                         break;
+                    case 0x3E:
+                        {
+                            bool carry = ram[rb.hl] & 0b1;
+
+                            writeByte(rb.hl, ram[rb.hl] >> 1);
+
+                            if (carry) rb.f |= 0b00010000;
+                            else rb.f &= 0b11101111;
+
+                            if (ram[rb.hl] == 0) rb.f |= 0b10000000;
+                            else rb.f &= 0b01111111;
+                            rb.f &= 0b10011111;
+
+                            if (debug) {
+                                printf("SRL (HL)");
+                            }
+
+                            rb.pc++;
+
+                            time = 16;
+                        }
+                        break;
                     case 0x3F:
                         {
                             bool carry = rb.a & 0b1;
@@ -4487,6 +4659,21 @@ void nextInstruction() {
                             time = 8;
                         }
                         break;
+                    case 0x46:
+                        {
+                            if (ram[rb.hl] & 0b1) rb.f &= 0b01111111;
+                            else rb.f |= 0b10000000;
+                            rb.f &= 0b10111111;
+                            rb.f |= 0b00100000;
+
+                            if (debug) {
+                                printf("BIT 0, (HL)");
+                            }
+                            rb.pc++;
+
+                            time = 16;
+                        }
+                        break;
                     case 0x47:
                         {
                             if (rb.a & 0b1) rb.f &= 0b01111111;
@@ -4590,6 +4777,21 @@ void nextInstruction() {
                             rb.pc++;
 
                             time = 8;
+                        }
+                        break;
+                    case 0x4E:
+                        {
+                            if (ram[rb.hl] & 0b10) rb.f &= 0b01111111;
+                            else rb.f |= 0b10000000;
+                            rb.f &= 0b10111111;
+                            rb.f |= 0b00100000;
+
+                            if (debug) {
+                                printf("BIT 1, (HL)");
+                            }
+                            rb.pc++;
+
+                            time = 16;
                         }
                         break;
                     case 0x4F:
@@ -4697,6 +4899,21 @@ void nextInstruction() {
                             time = 8;
                         }
                         break;
+                    case 0x56:
+                        {
+                            if (ram[rb.hl] & 0b100) rb.f &= 0b01111111;
+                            else rb.f |= 0b10000000;
+                            rb.f &= 0b10111111;
+                            rb.f |= 0b00100000;
+
+                            if (debug) {
+                                printf("BIT 2, (HL)");
+                            }
+                            rb.pc++;
+
+                            time = 16;
+                        }
+                        break;
                     case 0x57:
                         {
                             if (rb.a & 0b100) rb.f &= 0b01111111;
@@ -4802,6 +5019,21 @@ void nextInstruction() {
                             time = 8;
                         }
                         break;
+                    case 0x5E:
+                        {
+                            if (ram[rb.hl] & 0b1000) rb.f &= 0b01111111;
+                            else rb.f |= 0b10000000;
+                            rb.f &= 0b10111111;
+                            rb.f |= 0b00100000;
+
+                            if (debug) {
+                                printf("BIT 3, (HL)");
+                            }
+                            rb.pc++;
+
+                            time = 16;
+                        }
+                        break;
                     case 0x5F:
                         {
                             if (rb.a & 0b1000) rb.f &= 0b01111111;
@@ -4905,6 +5137,21 @@ void nextInstruction() {
                             rb.pc++;
 
                             time = 8;
+                        }
+                        break;
+                    case 0x66:
+                        {
+                            if (ram[rb.hl] & 0b10000) rb.f &= 0b01111111;
+                            else rb.f |= 0b10000000;
+                            rb.f &= 0b10111111;
+                            rb.f |= 0b00100000;
+
+                            if (debug) {
+                                printf("BIT 4, (HL)");
+                            }
+                            rb.pc++;
+
+                            time = 16;
                         }
                         break;
                     case 0x67:
@@ -5738,6 +5985,18 @@ void nextInstruction() {
                             time = 8;
                         }
                         break;
+                    case 0xA6:
+                        {
+                            writeByte(rb.hl, ram[rb.hl] & ~0b10000);
+
+                            if (debug) {
+                                printf("RES 4, (HL)");
+                            }
+                            rb.pc++;
+
+                            time = 16;
+                        }
+                        break;
                     case 0xA7:
                         {
                             rb.a &= ~0b10000;
@@ -5916,6 +6175,18 @@ void nextInstruction() {
                             rb.pc++;
 
                             time = 8;
+                        }
+                        break;
+                    case 0xB6:
+                        {
+                            writeByte(rb.hl, ram[rb.hl] & ~0b1000000);
+
+                            if (debug) {
+                                printf("RES 6, (HL)");
+                            }
+                            rb.pc++;
+
+                            time = 16;
                         }
                         break;
                     case 0xB7:
@@ -6672,6 +6943,18 @@ void nextInstruction() {
                             rb.pc++;
 
                             time = 8;
+                        }
+                        break;
+                    case 0xF6:
+                        {
+                            writeByte(rb.hl, ram[rb.hl] | 0b1000000);
+
+                            if (debug) {
+                                printf("SET 6, (HL)");
+                            }
+                            rb.pc++;
+
+                            time = 16;
                         }
                         break;
                     case 0xF7:

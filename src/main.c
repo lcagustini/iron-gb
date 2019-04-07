@@ -100,9 +100,18 @@ struct {
     uint16_t sp;
     uint16_t pc;
 } rb;
+
+struct {
+    uint8_t cartridge_type;
+    uint8_t rom_bank;
+    uint8_t eram_bank;
+    bool eram_enable;
+
+    FILE *rom;
+} cartridge;
+
 uint64_t cpu_clock;
 uint64_t gpu_clock;
-uint8_t cartridge_type;
 uint8_t ram[0x10000];
 bool IME;
 enum {
@@ -114,8 +123,8 @@ bool debug = false;
 #include "mmu.c"
 #include "cpu.c"
 
-void DMGReset(FILE *rom) {
-    fread(&ram, 0x8000, 1, rom);
+void DMGReset() {
+    fread(&ram, 0x8000, 1, cartridge.rom);
 
     FILE *bios = fopen("bios.gb", "rb");
     if (!bios) {
@@ -207,17 +216,17 @@ uint8_t drawBG(SDL_Surface *draw_surface, uint8_t x, uint8_t y) {
     return -1;
 }
 
-void printHeader(FILE *rom) {
-    fseek(rom, 0x0134, SEEK_SET);
+void printHeader() {
+    fseek(cartridge.rom, 0x0134, SEEK_SET);
 
     unsigned char buffer[20] = {0};
-    fread(buffer, 16, 1, rom);
+    fread(buffer, 16, 1, cartridge.rom);
 
     printf("ROM Loaded: %s\n", buffer);
 
-    fseek(rom, 0x0147, SEEK_SET);
-    fread(buffer, 1, 1, rom);
-    cartridge_type = buffer[0];
+    fseek(cartridge.rom, 0x0147, SEEK_SET);
+    fread(buffer, 1, 1, cartridge.rom);
+    cartridge.cartridge_type = buffer[0];
     printf("Cartridge Type: ");
     switch (buffer[0]) {
         case 0x00:
@@ -309,7 +318,7 @@ void printHeader(FILE *rom) {
     }
     printf("\n");
 
-    fread(buffer, 2, 1, rom);
+    fread(buffer, 2, 1, cartridge.rom);
     int ram_size;
     switch (buffer[2]) {
         case 1:
@@ -332,7 +341,17 @@ void printHeader(FILE *rom) {
     }
     printf("ROM Size: %dKB - RAM Size: %dKB\n", 32 << buffer[1], ram_size);
 
-    rewind(rom);
+    rewind(cartridge.rom);
+}
+
+void loadCartridge(char *path) {
+    cartridge.rom = fopen(path, "rb");
+    printHeader();
+    cartridge.rom_bank = 1;
+    cartridge.eram_bank = 0;
+    cartridge.eram_enable = false;
+
+    DMGReset();
 }
 
 int main(int argc, char* argv[]) {
@@ -355,9 +374,7 @@ int main(int argc, char* argv[]) {
             screen_surface->format->Rmask, screen_surface->format->Gmask,
             screen_surface->format->Bmask, screen_surface->format->Amask);
 
-    FILE *rom = fopen(argv[1], "rb");
-    printHeader(rom);
-    DMGReset(rom);
+    loadCartridge(argv[1]);
 
     SDL_Event e;
     while(1){
@@ -368,8 +385,8 @@ int main(int argc, char* argv[]) {
 
         if (BIOS == MAPPED && rb.pc == 0x100) {
             BIOS = UNMAPPED;
-            rewind(rom);
-            fread(&ram, 0x100, 1, rom);
+            rewind(cartridge.rom);
+            fread(&ram, 0x100, 1, cartridge.rom);
         }
 
         getInput();
@@ -406,6 +423,7 @@ int main(int argc, char* argv[]) {
                     if (ram[STAT] & 0b1000) ram[IF] |= 0b10;
 
                     // Render a line
+                    // TODO: Better pipeline for priority drawing
                     uint8_t y = ram[LY];
                     for (uint8_t x = 0; x < 160; x++) {
                         drawBG(draw_surface, x, y);
@@ -415,11 +433,11 @@ int main(int argc, char* argv[]) {
                                 uint8_t sx = ram[0xFE00 + 4*s + 1] - 8;
                                 if (y >= sy && y < sy + 8 &&
                                         x >= sx && x < sx + 8) {
-                                    if (ram[0xFE00 + 4*s + 3] & 0b10000000) {
+                                    /*if (ram[0xFE00 + 4*s + 3] & 0b10000000) {
                                         if (drawBG(draw_surface, x, y)) {
                                             break;
                                         }
-                                    }
+                                    }*/
 
                                     uint8_t tx = x - sx;
                                     uint8_t ty = y - sy;
@@ -468,7 +486,7 @@ int main(int argc, char* argv[]) {
                             SDL_FillRect(draw_surface, NULL, 0xFFFFFF);
                         }
                         SDL_BlitScaled(draw_surface, NULL, screen_surface, NULL);
-#if SHOW_TILESET
+#ifdef SHOW_TILESET
                         for (int tile = 0; tile < 384; tile++) {
                             int tx = 8*(tile % (ZOOM*20));
                             int ty = 8*(tile / (ZOOM*20));
@@ -516,7 +534,7 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    fclose(rom);
+    fclose(cartridge.rom);
     SDL_DestroyWindow(window);
     SDL_Quit();
     return 0;
