@@ -3,3 +3,4 @@ bin/
 *.gb.old
 *.sav
 dump
+roms/

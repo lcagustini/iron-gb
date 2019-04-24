@@ -1,6 +1,6 @@
 all:
 	@mkdir -p bin
-	gcc src/main.c -o bin/main -lSDL2 -O3
+	gcc src/main.c -o bin/main -lSDL2 -O3 -march=native -Wall
 
 debug:
 	@mkdir -p bin

@@ -1,5 +1,8 @@
 void nextInstruction() {
     if (debug) {
+        printf(COLOR_YELLOW "IF:" COLOR_RESET " %02X " COLOR_YELLOW "IE:" COLOR_RESET " %02X " COLOR_YELLOW "IME:" COLOR_RESET " %d\n", ram[IF], ram[IE], IME);
+        puts(COLOR_BLUE "--------------------");
+
         printf(COLOR_YELLOW "A:" COLOR_RESET " %02X " COLOR_YELLOW "F:" COLOR_RESET " %02X " COLOR_YELLOW "AF:" COLOR_RESET " %04X " COLOR_BLUE "(", rb.a, rb.f, rb.af);
 
         rb.f & 0b10000000 ? printf(COLOR_GREEN "Z") : printf(COLOR_RED "-");
@@ -407,7 +410,7 @@ void nextInstruction() {
                 else rb.pc -= (uint8_t) (-imm);
 
                 if (debug) {
-                    printf("JR %s0x%02X", imm < 0 ? "-" : "", imm < 0 ? -imm : imm);
+                    printf("JR %s0x%02X", imm < 0 ? "-" : "+", imm < 0 ? -imm : imm);
                 }
                 rb.pc += 2;
 
@@ -542,7 +545,7 @@ void nextInstruction() {
                 }
 
                 if (debug) {
-                    printf("JR NZ, %s0x%02X", imm < 0 ? "-" : "", imm < 0 ? -imm : imm);
+                    printf("JR NZ, %s0x%02X", imm < 0 ? "-" : "+", imm < 0 ? -imm : imm);
                 }
                 rb.pc += 2;
             }
@@ -685,7 +688,7 @@ void nextInstruction() {
                 }
 
                 if (debug) {
-                    printf("JR Z, %s0x%02X", imm < 0 ? "-" : "", imm < 0 ? -imm : imm);
+                    printf("JR Z, %s0x%02X", imm < 0 ? "-" : "+", imm < 0 ? -imm : imm);
                 }
                 rb.pc += 2;
             }
@@ -814,7 +817,7 @@ void nextInstruction() {
                 }
 
                 if (debug) {
-                    printf("JR NC, %s0x%02X", imm < 0 ? "-" : "", imm < 0 ? -imm : imm);
+                    printf("JR NC, %s0x%02X", imm < 0 ? "-" : "+", imm < 0 ? -imm : imm);
                 }
                 rb.pc += 2;
             }
@@ -937,7 +940,7 @@ void nextInstruction() {
                 }
 
                 if (debug) {
-                    printf("JR C, %s0x%02X", imm < 0 ? "-" : "", imm < 0 ? -imm : imm);
+                    printf("JR C, %s0x%02X", imm < 0 ? "-" : "+", imm < 0 ? -imm : imm);
                 }
                 rb.pc += 2;
             }
@@ -7424,7 +7427,7 @@ void nextInstruction() {
                 writeByte(imm, rb.a);
 
                 if (debug) {
-                    printf("LDH (C), A", imm);
+                    printf("LDH (C), A");
                 }
                 rb.pc++;
 
@@ -7600,7 +7603,7 @@ void nextInstruction() {
                 rb.a = ram[imm];
 
                 if (debug) {
-                    printf("LDH A, (C)", imm);
+                    printf("LDH A, (C)");
                 }
                 rb.pc++;
 
@@ -7688,7 +7691,7 @@ void nextInstruction() {
                 rb.hl = rb.sp + imm;
 
                 if (debug) {
-                    printf("LD HL, (SP + 0x%02X)", imm);
+                    printf("LD HL, (SP %s 0x%02X)", imm < 0 ? "-" : "+", imm < 0 ? -imm : imm);
                 }
                 rb.pc += 2;
 

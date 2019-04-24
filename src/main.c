@@ -152,6 +152,7 @@ void DMGReset() {
     rb.sp = 0xFFFE;
 
     ram[P1] = 0xFF;
+    ram[DIV] = 0;
     ram[TIMA] = 0;
     ram[TMA] = 0;
     ram[TAC] = 0;
@@ -187,12 +188,48 @@ void DMGReset() {
     ram[IE] = 0x00;
 }
 
+uint8_t drawWindow(SDL_Surface *draw_surface, uint8_t x, uint8_t y) {
+    if ((ram[LCDC] & 0b1) && (ram[LCDC] & 0b100000)) {
+        uint8_t wx = ram[WX];
+        uint8_t wy = ram[WY];
+
+        if (wy > 143 || wx > 166) return 0;
+
+        uint8_t sx = wx - 7;
+        uint8_t sy = wy;
+
+        if (sx != x || sy != y) return 0;
+
+        uint64_t i = 32*(sy/8) + sx/8;
+        uint8_t tile = ram[(ram[LCDC] & 0b1000000 ? 0x9C00 : 0x9800) + i];
+        uint8_t tileset = ram[LCDC] & 0b10000;
+        if (!tileset) {
+            tile += 128;
+        }
+
+        uint8_t low = ram[(tileset ? 0x8000 : 0x8800) + tile*16 + 2*(sy % 8)];
+        uint8_t high = ram[(tileset ? 0x8001 : 0x8801) + tile*16 + 2*(sy % 8)];
+
+        uint8_t tx = sx % 8;
+        uint8_t pixel = (((low << tx) & 0xFF) >> 7) | ((((high << tx) & 0xFF) >> 7) << 1);
+        uint32_t color = 0xFFFFFF - (((ram[BGP] >> (2*pixel)) & 0b11) * 5592405);
+
+        uint32_t *pixels = (uint32_t *)draw_surface->pixels;
+        pixels[(y*draw_surface->w) + x] = color;
+
+        return pixel;
+    }
+    else {
+        return 0;
+    }
+}
+
 uint8_t drawBG(SDL_Surface *draw_surface, uint8_t x, uint8_t y) {
     if (ram[LCDC] & 0b1) {
         uint8_t sx = x + ram[SCX];
-        if (sx > 160) sx = 160;
+        //if (sx > 160) sx = 160;
         uint8_t sy = y + ram[SCY];
-        if (sy > 144) sy = 144;
+        //if (sy > 144) sy = 144;
 
         uint64_t i = 32*(sy/8) + sx/8;
         uint8_t tile = ram[(ram[LCDC] & 0b1000 ? 0x9C00 : 0x9800) + i];
@@ -213,7 +250,12 @@ uint8_t drawBG(SDL_Surface *draw_surface, uint8_t x, uint8_t y) {
 
         return pixel;
     }
-    return -1;
+    else {
+        uint32_t *pixels = (uint32_t *)draw_surface->pixels;
+        pixels[(y*draw_surface->w) + x] = 0xFFFFFF;
+
+        return 0;
+    }
 }
 
 void printHeader() {
@@ -423,22 +465,18 @@ int main(int argc, char* argv[]) {
                     if (ram[STAT] & 0b1000) ram[IF] |= 0b10;
 
                     // Render a line
-                    // TODO: Better pipeline for priority drawing
+                    // TODO: Better pipeline for sprite priority drawing
+                    // TODO: Slow to go over every sprite for every pixel
                     uint8_t y = ram[LY];
                     for (uint8_t x = 0; x < 160; x++) {
-                        drawBG(draw_surface, x, y);
+                        int bg_pixel = drawBG(draw_surface, x, y);
+                        bg_pixel |= drawWindow(draw_surface, x, y);
                         if (ram[LCDC] & 0b10) {
                             for (int s = 0; s < 40; s++) {
-                                uint8_t sy = ram[0xFE00 + 4*s] - 16;
-                                uint8_t sx = ram[0xFE00 + 4*s + 1] - 8;
-                                if (y >= sy && y < sy + 8 &&
-                                        x >= sx && x < sx + 8) {
-                                    /*if (ram[0xFE00 + 4*s + 3] & 0b10000000) {
-                                        if (drawBG(draw_surface, x, y)) {
-                                            break;
-                                        }
-                                    }*/
-
+                                int16_t sy = ram[0xFE00 + 4*s] - 16;
+                                int16_t sx = ram[0xFE00 + 4*s + 1] - 8;
+                                if ((int)y >= sy && (int)y < sy + 8 &&
+                                        (int)x  >= sx && (int)x < sx + 8) {
                                     uint8_t tx = x - sx;
                                     uint8_t ty = y - sy;
 
@@ -456,11 +494,14 @@ int main(int argc, char* argv[]) {
 
                                     uint8_t pixel = (((low << tx) & 0xFF) >> 7) | ((((high << tx) & 0xFF) >> 7) << 1);
                                     if (pixel) {
-                                        uint8_t palette = (ram[0xFE00 + 4*s + 3] & 0b10000) ? ram[OBP1] : ram[OBP0];
-                                        uint32_t color = 0xFFFFFF - (((palette >> (2*pixel)) & 0b11) * 5592405);
+                                        bool priority = ram[0xFE00 + 4*s + 3] & 0b10000000;
+                                        if (!priority || (priority && !bg_pixel)) {
+                                            uint8_t palette = (ram[0xFE00 + 4*s + 3] & 0b10000) ? ram[OBP1] : ram[OBP0];
+                                            uint32_t color = 0xFFFFFF - (((palette >> (2*pixel)) & 0b11) * 5592405);
 
-                                        Uint32 *pixels = (Uint32 *)draw_surface->pixels;
-                                        pixels[(y*draw_surface->w) + x] = color;
+                                            Uint32 *pixels = (Uint32 *)draw_surface->pixels;
+                                            pixels[(y*draw_surface->w) + x] = color;
+                                        }
                                     }
 
                                     break;
@@ -526,6 +567,9 @@ int main(int argc, char* argv[]) {
                         ram[STAT] |= 0b10;
 
                         if (ram[STAT] & 0b10000) ram[IF] |= 0b10;
+
+                        //mem_dump(0xFE00, 0xFE9F);
+                        //puts("");
 
                         ram[LY] = 0;
                     }

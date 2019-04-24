@@ -36,8 +36,9 @@ void writeByte(uint16_t addr, uint8_t value) {
     if (addr >= 0xFEA0 && addr <= 0xFEFF) return;
 
     switch (addr) {
-        case DIV:
         case LY:
+            break;
+        case DIV:
             ram[addr] = 0;
             break;
         case DMA:
@@ -166,18 +167,18 @@ void getInput() {
 }
 
 void updateRegisters() {
-    static uint64_t last_clock = 0;
-    if (cpu_clock - last_clock >= 256) {
-        ram[DIV]++;
-        last_clock += 256;
-    }
-
     if (ram[LYC] == ram[LY]) {
         ram[STAT] |= 0b100;
         if (ram[STAT] & 0b1000000) ram[IF] |= 0b10;
     }
     else {
         ram[STAT] &= ~0b100;
+    }
+
+    static uint64_t last_clock = 0;
+    if (cpu_clock - last_clock >= 256) {
+        ram[DIV]++;
+        last_clock += 256;
     }
 
     int rate = ram[TAC] & 0b11;
@@ -201,13 +202,14 @@ void updateRegisters() {
     bool test_bit = rate && (ram[TAC] & 0b100);
 
     if (last_test_bit && !test_bit) {
-        ram[TIMA]++;
+        if (ram[TIMA] == 0) {
+            ram[TIMA] = ram[TMA];
+
+            ram[IF] |= 0b100;
+        }
+        else {
+            ram[TIMA]++;
+        }
     }
     last_test_bit = test_bit;
-
-    if (ram[TIMA] == 0) {
-        ram[TIMA] = ram[TMA];
-
-        ram[IF] |= 0b100;
-    }
 }
