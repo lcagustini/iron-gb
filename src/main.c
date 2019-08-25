@@ -502,9 +502,8 @@ int main(int argc, char* argv[]) {
                       Uint32 *pixels = (Uint32 *)draw_surface->pixels;
                       pixels[(y*draw_surface->w) + x] = color;
                     }
+                    break;
                   }
-
-                  break;
                 }
               }
             }
