@@ -195,10 +195,10 @@ uint8_t drawWindow(SDL_Surface *draw_surface, uint8_t x, uint8_t y) {
 
     if (wy > 143 || wx > 166) return 0;
 
-    uint8_t sx = wx - 7;
-    uint8_t sy = wy;
+    int16_t sx = x - (wx - 7);
+    int16_t sy = y - wy;
 
-    if (sx != x || sy != y) return 0;
+    if (sx < 0 || sy < 0) return 0;
 
     uint64_t i = 32*(sy/8) + sx/8;
     uint8_t tile = ram[(ram[LCDC] & 0b1000000 ? 0x9C00 : 0x9800) + i];
