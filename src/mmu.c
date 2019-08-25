@@ -29,11 +29,25 @@ void DMATransfer() {
   for (int i = 0; i < 0xA0; i++) {
     ram[0xFE00 + i] = ram[source + i];
   }
+  cpu_clock += 671;
+  gpu_clock += 671;
+}
+
+uint8_t readByte(uint16_t addr) {
+  //int mode = ram[STAT] & 0b11;
+  //if (addr >= 0x8000 && addr <= 0x9FFF && mode > 2) return 0xFF;
+  //if (addr >= 0xFE00 && addr <= 0xFE9F && mode > 1) return 0xFF;
+
+  return ram[addr];
 }
 
 void writeByte(uint16_t addr, uint8_t value) {
   if (addr <= 0x7FFF) return; //Can't write to ROM (no banking support yet)
   if (addr >= 0xFEA0 && addr <= 0xFEFF) return;
+
+  //int mode = ram[STAT] & 0b11;
+  //if (addr >= 0x8000 && addr <= 0x9FFF && mode > 2) return;
+  //if (addr >= 0xFE00 && addr <= 0xFE9F && mode > 1) return;
 
   switch (addr) {
     case LY:
@@ -167,6 +181,7 @@ void getInput() {
 }
 
 void updateRegisters() {
+  // LYC
   if (ram[LYC] == ram[LY]) {
     ram[STAT] |= 0b100;
     if (ram[STAT] & 0b1000000) ram[IF] |= 0b10;
@@ -175,41 +190,43 @@ void updateRegisters() {
     ram[STAT] &= ~0b100;
   }
 
+  // DIV
   static uint64_t last_clock = 0;
   if (cpu_clock - last_clock >= 256) {
     ram[DIV]++;
     last_clock += 256;
   }
 
-  int rate = ram[TAC] & 0b11;
+  // Timer
+  if (ram[TAC] & 0b100) {
+    int rate = ram[TAC] & 0b11;
 
-  static bool last_test_bit = true;
-  switch (rate) {
-    case 0:
-      rate = ram[DIV] & 0b10;
-      break;
-    case 1:
-      rate = ram[DIV] & 0b10000000;
-      break;
-    case 2:
-      rate = ram[DIV] & 0b100000;
-      break;
-    case 3:
-      rate = ram[DIV] & 0b1000;
-      break;
-  }
-
-  bool test_bit = rate && (ram[TAC] & 0b100);
-
-  if (last_test_bit && !test_bit) {
-    if (ram[TIMA] == 0) {
-      ram[TIMA] = ram[TMA];
-
-      ram[IF] |= 0b100;
+    static bool last_test_bit = true;
+    switch (rate) {
+      case 0:
+        rate = ram[DIV] & 0b10;
+        break;
+      case 1:
+        rate = ram[DIV] & 0b10000000;
+        break;
+      case 2:
+        rate = ram[DIV] & 0b100000;
+        break;
+      case 3:
+        rate = ram[DIV] & 0b1000;
+        break;
     }
-    else {
-      ram[TIMA]++;
+
+    if (last_test_bit && !rate) {
+      if (ram[TIMA] == 0) {
+        ram[TIMA] = ram[TMA];
+
+        ram[IF] |= 0b100;
+      }
+      else {
+        ram[TIMA]++;
+      }
     }
+    last_test_bit = rate;
   }
-  last_test_bit = test_bit;
 }

@@ -112,6 +112,7 @@ struct {
 
 uint64_t cpu_clock;
 uint64_t gpu_clock;
+
 uint8_t ram[0x10000];
 bool IME;
 enum {
@@ -432,8 +433,8 @@ int main(int argc, char* argv[]) {
     }
 
     getInput();
-    handleInterrupts();
     updateRegisters();
+    handleInterrupts();
     nextInstruction();
 
     if (SDL_GetKeyboardState(NULL)[SDL_SCANCODE_D]) {

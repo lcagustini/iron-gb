@@ -1,6 +1,6 @@
 void nextInstruction() {
   if (debug) {
-    printf(COLOR_YELLOW "IF:" COLOR_RESET " %02X " COLOR_YELLOW "IE:" COLOR_RESET " %02X " COLOR_YELLOW "IME:" COLOR_RESET " %d\n", ram[IF], ram[IE], IME);
+    printf(COLOR_YELLOW "IF:" COLOR_RESET " %02X " COLOR_YELLOW "IE:" COLOR_RESET " %02X " COLOR_YELLOW "IME:" COLOR_RESET " %d\n", readByte(IF), readByte(IE), IME);
     puts(COLOR_BLUE "--------------------");
 
     printf(COLOR_YELLOW "A:" COLOR_RESET " %02X " COLOR_YELLOW "F:" COLOR_RESET " %02X " COLOR_YELLOW "AF:" COLOR_RESET " %04X " COLOR_BLUE "(", rb.a, rb.f, rb.af);
@@ -20,7 +20,7 @@ void nextInstruction() {
   rb.f &= 0xF0;
 
   uint8_t time = 0;
-  uint8_t byte = ram[rb.pc];
+  uint8_t byte = readByte(rb.pc);
   switch (byte) {
     case 0x00:
     case 0xD3:
@@ -45,7 +45,7 @@ void nextInstruction() {
       break;
     case 0x01:
       {
-        uint16_t imm = ram[rb.pc+1] | (ram[rb.pc+2] << 8);
+        uint16_t imm = readByte(rb.pc+1) | (readByte(rb.pc+2) << 8);
 
         rb.bc = imm;
 
@@ -121,7 +121,7 @@ void nextInstruction() {
       break;
     case 0x06:
       {
-        uint8_t imm = ram[rb.pc+1];
+        uint8_t imm = readByte(rb.pc+1);
 
         rb.b = imm;
 
@@ -155,7 +155,7 @@ void nextInstruction() {
       break;
     case 0x08:
       {
-        uint16_t imm = ram[rb.pc+1] | (ram[rb.pc+2] << 8);
+        uint16_t imm = readByte(rb.pc+1) | (readByte(rb.pc+2) << 8);
 
         writeByte(imm+1, (rb.sp & 0xFF00) >> 8);
         writeByte(imm, (rb.sp & 0xFF));
@@ -188,7 +188,7 @@ void nextInstruction() {
       break;
     case 0x0A:
       {
-        rb.a = ram[rb.bc];
+        rb.a = readByte(rb.bc);
 
         if (debug) {
           printf("LD A, (BC)");
@@ -250,7 +250,7 @@ void nextInstruction() {
       break;
     case 0x0E:
       {
-        uint8_t imm = ram[rb.pc+1];
+        uint8_t imm = readByte(rb.pc+1);
 
         rb.c = imm;
 
@@ -294,7 +294,7 @@ void nextInstruction() {
       break;
     case 0x11:
       {
-        uint16_t imm = ram[rb.pc+1] | (ram[rb.pc+2] << 8);
+        uint16_t imm = readByte(rb.pc+1) | (readByte(rb.pc+2) << 8);
 
         rb.de = imm;
 
@@ -370,7 +370,7 @@ void nextInstruction() {
       break;
     case 0x16:
       {
-        uint8_t imm = ram[rb.pc+1];
+        uint8_t imm = readByte(rb.pc+1);
 
         rb.d = imm;
 
@@ -404,7 +404,7 @@ void nextInstruction() {
       break;
     case 0x18:
       {
-        int8_t imm = ram[rb.pc+1];
+        int8_t imm = readByte(rb.pc+1);
 
         if (imm >= 0) rb.pc += imm;
         else rb.pc -= (uint8_t) (-imm);
@@ -437,7 +437,7 @@ void nextInstruction() {
       break;
     case 0x1A:
       {
-        rb.a = ram[rb.de];
+        rb.a = readByte(rb.de);
 
         if (debug) {
           printf("LD A, (DE)");
@@ -499,7 +499,7 @@ void nextInstruction() {
       break;
     case 0x1E:
       {
-        uint8_t imm = ram[rb.pc+1];
+        uint8_t imm = readByte(rb.pc+1);
 
         rb.e = imm;
 
@@ -532,7 +532,7 @@ void nextInstruction() {
       break;
     case 0x20:
       {
-        int8_t imm = ram[rb.pc+1];
+        int8_t imm = readByte(rb.pc+1);
 
         if (!(rb.f & 0b10000000)) {
           if (imm >= 0) rb.pc += imm;
@@ -552,7 +552,7 @@ void nextInstruction() {
       break;
     case 0x21:
       {
-        uint16_t imm = ram[rb.pc+1] | (ram[rb.pc+2] << 8);
+        uint16_t imm = readByte(rb.pc+1) | (readByte(rb.pc+2) << 8);
 
         rb.hl = imm;
 
@@ -629,7 +629,7 @@ void nextInstruction() {
       break;
     case 0x26:
       {
-        uint8_t imm = ram[rb.pc+1];
+        uint8_t imm = readByte(rb.pc+1);
 
         rb.h = imm;
 
@@ -675,7 +675,7 @@ void nextInstruction() {
       break;
     case 0x28:
       {
-        int8_t imm = ram[rb.pc+1];
+        int8_t imm = readByte(rb.pc+1);
 
         if (rb.f & 0b10000000) {
           if (imm >= 0) rb.pc += imm;
@@ -713,7 +713,7 @@ void nextInstruction() {
       break;
     case 0x2A:
       {
-        rb.a = ram[rb.hl];
+        rb.a = readByte(rb.hl);
         rb.hl++;
 
         if (debug) {
@@ -776,7 +776,7 @@ void nextInstruction() {
       break;
     case 0x2E:
       {
-        uint8_t imm = ram[rb.pc+1];
+        uint8_t imm = readByte(rb.pc+1);
 
         rb.l = imm;
 
@@ -804,7 +804,7 @@ void nextInstruction() {
       break;
     case 0x30:
       {
-        int8_t imm = ram[rb.pc+1];
+        int8_t imm = readByte(rb.pc+1);
 
         if (!(rb.f & 0b00010000)) {
           if (imm >= 0) rb.pc += imm;
@@ -824,7 +824,7 @@ void nextInstruction() {
       break;
     case 0x31:
       {
-        uint16_t imm = ram[rb.pc+1] | (ram[rb.pc+2] << 8);
+        uint16_t imm = readByte(rb.pc+1) | (readByte(rb.pc+2) << 8);
         rb.sp = imm;
 
         if (debug) {
@@ -862,12 +862,12 @@ void nextInstruction() {
       break;
     case 0x34:
       {
-        if ((ram[rb.hl] & 0xF) + 1 > 0xF) rb.f |= 0b00100000;
+        if ((readByte(rb.hl) & 0xF) + 1 > 0xF) rb.f |= 0b00100000;
         else rb.f &= ~0b00100000;
 
-        writeByte(rb.hl, ram[rb.hl] +1);
+        writeByte(rb.hl, readByte(rb.hl) +1);
 
-        if (ram[rb.hl] == 0) rb.f |= 0b10000000;
+        if (readByte(rb.hl) == 0) rb.f |= 0b10000000;
         else rb.f &= 0b01111111;
         rb.f &= 0b10111111;
 
@@ -881,12 +881,12 @@ void nextInstruction() {
       break;
     case 0x35:
       {
-        if ((int)(ram[rb.hl] & 0xF) - 1 < 0) rb.f |= 0b00100000;
+        if ((int)(readByte(rb.hl) & 0xF) - 1 < 0) rb.f |= 0b00100000;
         else rb.f &= ~0b00100000;
 
-        writeByte(rb.hl, ram[rb.hl] -1);
+        writeByte(rb.hl, readByte(rb.hl) -1);
 
-        if (ram[rb.hl] == 0) rb.f |= 0b10000000;
+        if (readByte(rb.hl) == 0) rb.f |= 0b10000000;
         else rb.f &= 0b01111111;
         rb.f |= 0b01000000;
 
@@ -900,7 +900,7 @@ void nextInstruction() {
       break;
     case 0x36:
       {
-        uint8_t imm = ram[rb.pc+1];
+        uint8_t imm = readByte(rb.pc+1);
 
         writeByte(rb.hl, imm);
 
@@ -927,7 +927,7 @@ void nextInstruction() {
       break;
     case 0x38:
       {
-        int8_t imm = ram[rb.pc+1];
+        int8_t imm = readByte(rb.pc+1);
 
         if (rb.f & 0b00010000) {
           if (imm >= 0) rb.pc += imm;
@@ -965,7 +965,7 @@ void nextInstruction() {
       break;
     case 0x3A:
       {
-        rb.a = ram[rb.hl];
+        rb.a = readByte(rb.hl);
         rb.hl--;
 
         if (debug) {
@@ -1028,7 +1028,7 @@ void nextInstruction() {
       break;
     case 0x3E:
       {
-        uint8_t imm = ram[rb.pc+1];
+        uint8_t imm = readByte(rb.pc+1);
 
         rb.a = imm;
 
@@ -1127,7 +1127,7 @@ void nextInstruction() {
       break;
     case 0x46:
       {
-        rb.b = ram[rb.hl];
+        rb.b = readByte(rb.hl);
 
         if (debug) {
           printf("LD B, (HL)");
@@ -1221,7 +1221,7 @@ void nextInstruction() {
       break;
     case 0x4E:
       {
-        rb.c = ram[rb.hl];
+        rb.c = readByte(rb.hl);
 
         if (debug) {
           printf("LD C, (HL)");
@@ -1315,7 +1315,7 @@ void nextInstruction() {
       break;
     case 0x56:
       {
-        rb.d = ram[rb.hl];
+        rb.d = readByte(rb.hl);
 
         if (debug) {
           printf("LD D, (HL)");
@@ -1409,7 +1409,7 @@ void nextInstruction() {
       break;
     case 0x5E:
       {
-        rb.e = ram[rb.hl];
+        rb.e = readByte(rb.hl);
 
         if (debug) {
           printf("LD E, (HL)");
@@ -1503,7 +1503,7 @@ void nextInstruction() {
       break;
     case 0x66:
       {
-        rb.h = ram[rb.hl];
+        rb.h = readByte(rb.hl);
 
         if (debug) {
           printf("LD H, (HL)");
@@ -1597,7 +1597,7 @@ void nextInstruction() {
       break;
     case 0x6E:
       {
-        rb.l = ram[rb.hl];
+        rb.l = readByte(rb.hl);
 
         if (debug) {
           printf("LD L, (HL)");
@@ -1787,7 +1787,7 @@ void nextInstruction() {
       break;
     case 0x7E:
       {
-        rb.a = ram[rb.hl];
+        rb.a = readByte(rb.hl);
 
         if (debug) {
           printf("LD A, (HL)");
@@ -1935,12 +1935,12 @@ void nextInstruction() {
       break;
     case 0x86:
       {
-        if ((rb.a & 0xF) + (ram[rb.hl] & 0xF) > 0xF) rb.f |= 0b00100000;
+        if ((rb.a & 0xF) + (readByte(rb.hl) & 0xF) > 0xF) rb.f |= 0b00100000;
         else rb.f &= ~0b00100000;
-        if ((rb.a & 0xFF) + (ram[rb.hl] & 0xFF) > 0xFF) rb.f |= 0b00010000;
+        if ((rb.a & 0xFF) + (readByte(rb.hl) & 0xFF) > 0xFF) rb.f |= 0b00010000;
         else rb.f &= ~0b00010000;
 
-        rb.a = rb.a + ram[rb.hl];
+        rb.a = rb.a + readByte(rb.hl);
 
         if (rb.a == 0) rb.f |= 0b10000000;
         else rb.f &= 0b01111111;
@@ -2117,12 +2117,12 @@ void nextInstruction() {
       {
         uint8_t carry = ((rb.f >> 4) & 1);
 
-        if ((rb.a & 0xF) + (ram[rb.hl] & 0xF) + carry > 0xF) rb.f |= 0b00100000;
+        if ((rb.a & 0xF) + (readByte(rb.hl) & 0xF) + carry > 0xF) rb.f |= 0b00100000;
         else rb.f &= ~0b00100000;
-        if ((rb.a & 0xFF) + (ram[rb.hl] & 0xFF) + carry > 0xFF) rb.f |= 0b00010000;
+        if ((rb.a & 0xFF) + (readByte(rb.hl) & 0xFF) + carry > 0xFF) rb.f |= 0b00010000;
         else rb.f &= ~0b00010000;
 
-        rb.a = rb.a + ram[rb.hl] + carry;
+        rb.a = rb.a + readByte(rb.hl) + carry;
 
         if (rb.a == 0) rb.f |= 0b10000000;
         else rb.f &= 0b01111111;
@@ -2287,12 +2287,12 @@ void nextInstruction() {
       break;
     case 0x96:
       {
-        if ((int)(rb.a & 0xF) - (int)(ram[rb.hl] & 0xF) < 0) rb.f |= 0b00100000;
+        if ((int)(rb.a & 0xF) - (int)(readByte(rb.hl) & 0xF) < 0) rb.f |= 0b00100000;
         else rb.f &= ~0b00100000;
-        if ((int)(rb.a & 0xFF) - (int)(ram[rb.hl] & 0xFF) < 0) rb.f |= 0b00010000;
+        if ((int)(rb.a & 0xFF) - (int)(readByte(rb.hl) & 0xFF) < 0) rb.f |= 0b00010000;
         else rb.f &= ~0b00010000;
 
-        rb.a = rb.a - ram[rb.hl];
+        rb.a = rb.a - readByte(rb.hl);
 
         if (rb.a == 0) rb.f |= 0b10000000;
         else rb.f &= 0b01111111;
@@ -2469,12 +2469,12 @@ void nextInstruction() {
       {
         uint8_t carry = ((rb.f >> 4) & 1);
 
-        if ((int)(rb.a & 0xF) - (int)(ram[rb.hl] & 0xF) - (int)carry < 0) rb.f |= 0b00100000;
+        if ((int)(rb.a & 0xF) - (int)(readByte(rb.hl) & 0xF) - (int)carry < 0) rb.f |= 0b00100000;
         else rb.f &= ~0b00100000;
-        if ((int)(rb.a & 0xFF) - (int)(ram[rb.hl] & 0xFF) - (int)carry < 0) rb.f |= 0b00010000;
+        if ((int)(rb.a & 0xFF) - (int)(readByte(rb.hl) & 0xFF) - (int)carry < 0) rb.f |= 0b00010000;
         else rb.f &= ~0b00010000;
 
-        rb.a = rb.a - ram[rb.hl] - carry;
+        rb.a = rb.a - readByte(rb.hl) - carry;
 
         if (rb.a == 0) rb.f |= 0b10000000;
         else rb.f &= 0b01111111;
@@ -2615,7 +2615,7 @@ void nextInstruction() {
       break;
     case 0xA6:
       {
-        rb.a = rb.a & ram[rb.hl];
+        rb.a = rb.a & readByte(rb.hl);
 
         if (rb.a == 0) rb.f |= 0b10000000;
         else rb.f &= 0b01111111;
@@ -2745,7 +2745,7 @@ void nextInstruction() {
       break;
     case 0xAE:
       {
-        rb.a = rb.a ^ ram[rb.hl];
+        rb.a = rb.a ^ readByte(rb.hl);
 
         if (rb.a == 0) rb.f |= 0b10000000;
         else rb.f &= 0b01111111;
@@ -2871,7 +2871,7 @@ void nextInstruction() {
       break;
     case 0xB6:
       {
-        rb.a = rb.a | ram[rb.hl];
+        rb.a = rb.a | readByte(rb.hl);
 
         if (rb.a == 0) rb.f |= 0b10000000;
         else rb.f &= 0b01111111;
@@ -3017,13 +3017,13 @@ void nextInstruction() {
       break;
     case 0xBE:
       {
-        uint16_t temp = rb.a - ram[rb.hl];
+        uint16_t temp = rb.a - readByte(rb.hl);
         if (temp == 0) rb.f |= 0b10000000;
         else rb.f &= 0b01111111;
         rb.f |= 0b01000000;
-        if ((int)(rb.a & 0xF) - (int)(ram[rb.hl] & 0xF) < 0) rb.f |= 0b00100000;
+        if ((int)(rb.a & 0xF) - (int)(readByte(rb.hl) & 0xF) < 0) rb.f |= 0b00100000;
         else rb.f &= ~0b00100000;
-        if ((int)(rb.a & 0xFF) - (int)(ram[rb.hl] & 0xFF) < 0) rb.f |= 0b00010000;
+        if ((int)(rb.a & 0xFF) - (int)(readByte(rb.hl) & 0xFF) < 0) rb.f |= 0b00010000;
         else rb.f &= 0b11101111;
 
         if (debug) {
@@ -3056,7 +3056,7 @@ void nextInstruction() {
     case 0xC0:
       {
         if (!(rb.f & 0b10000000)) {
-          rb.pc = ram[rb.sp] | ram[rb.sp+1] << 8;
+          rb.pc = readByte(rb.sp) | readByte(rb.sp+1) << 8;
           rb.sp += 2;
 
           time = 20;
@@ -3074,8 +3074,8 @@ void nextInstruction() {
       break;
     case 0xC1:
       {
-        rb.c = ram[rb.sp];
-        rb.b = ram[rb.sp+1];
+        rb.c = readByte(rb.sp);
+        rb.b = readByte(rb.sp+1);
         rb.sp += 2;
 
         if (debug) {
@@ -3088,7 +3088,7 @@ void nextInstruction() {
       break;
     case 0xC2:
       {
-        uint16_t addr = ram[rb.pc+1] | (ram[rb.pc+2] << 8);
+        uint16_t addr = readByte(rb.pc+1) | (readByte(rb.pc+2) << 8);
 
         if (!(rb.f & 0b10000000)) {
           rb.pc = addr;
@@ -3108,7 +3108,7 @@ void nextInstruction() {
       break;
     case 0xC3:
       {
-        uint16_t addr = ram[rb.pc+1] | (ram[rb.pc+2] << 8);
+        uint16_t addr = readByte(rb.pc+1) | (readByte(rb.pc+2) << 8);
 
         if (debug) {
           printf("JP 0x%04X", addr);
@@ -3120,7 +3120,7 @@ void nextInstruction() {
       break;
     case 0xC4:
       {
-        uint16_t addr = ram[rb.pc+1] | (ram[rb.pc+2] << 8);
+        uint16_t addr = readByte(rb.pc+1) | (readByte(rb.pc+2) << 8);
         rb.pc += 3;
 
         if (!(rb.f & 0b10000000)) {
@@ -3156,7 +3156,7 @@ void nextInstruction() {
       break;
     case 0xC6:
       {
-        uint8_t imm = ram[rb.pc+1];
+        uint8_t imm = readByte(rb.pc+1);
         if ((rb.a & 0xF) + (imm & 0xF) > 0xF) rb.f |= 0b00100000;
         else rb.f &= ~0b00100000;
         if ((rb.a & 0xFF) + (imm & 0xFF) > 0xFF) rb.f |= 0b00010000;
@@ -3194,7 +3194,7 @@ void nextInstruction() {
     case 0xC8:
       {
         if (rb.f & 0b10000000) {
-          rb.pc = ram[rb.sp] | ram[rb.sp+1] << 8;
+          rb.pc = readByte(rb.sp) | readByte(rb.sp+1) << 8;
           rb.sp += 2;
 
           time = 20;
@@ -3212,7 +3212,7 @@ void nextInstruction() {
       break;
     case 0xC9:
       {
-        rb.pc = ram[rb.sp] | ram[rb.sp+1] << 8;
+        rb.pc = readByte(rb.sp) | readByte(rb.sp+1) << 8;
         rb.sp += 2;
 
         if (debug) {
@@ -3224,7 +3224,7 @@ void nextInstruction() {
       break;
     case 0xCA:
       {
-        uint16_t addr = ram[rb.pc+1] | (ram[rb.pc+2] << 8);
+        uint16_t addr = readByte(rb.pc+1) | (readByte(rb.pc+2) << 8);
 
         if (rb.f & 0b10000000) {
           rb.pc = addr;
@@ -3245,7 +3245,7 @@ void nextInstruction() {
     case 0xCB:
       {
         rb.pc++;
-        uint8_t byte = ram[rb.pc];
+        uint8_t byte = readByte(rb.pc);
         switch (byte) {
           case 0x00:
             {
@@ -3381,14 +3381,14 @@ void nextInstruction() {
             break;
           case 0x06:
             {
-              bool carry = ram[rb.hl] & 0b10000000;
+              bool carry = readByte(rb.hl) & 0b10000000;
 
-              writeByte(rb.hl, ram[rb.hl] << 1);
-              writeByte(rb.hl, ram[rb.hl] | (carry >> 7));
+              writeByte(rb.hl, readByte(rb.hl) << 1);
+              writeByte(rb.hl, readByte(rb.hl) | (carry >> 7));
 
               if (carry) rb.f |= 0b00010000;
               else rb.f &= 0b11101111;
-              if (ram[rb.hl] == 0) rb.f |= 0b10000000;
+              if (readByte(rb.hl) == 0) rb.f |= 0b10000000;
               else rb.f &= 0b01111111;
               rb.f &= 0b10011111;
 
@@ -3551,14 +3551,14 @@ void nextInstruction() {
             break;
           case 0x0E:
             {
-              bool carry = ram[rb.hl] & 0b1;
+              bool carry = readByte(rb.hl) & 0b1;
 
-              writeByte(rb.hl, ram[rb.hl] >> 1);
-              writeByte(rb.hl, ram[rb.hl] | (carry << 7));
+              writeByte(rb.hl, readByte(rb.hl) >> 1);
+              writeByte(rb.hl, readByte(rb.hl) | (carry << 7));
 
               if (carry) rb.f |= 0b00010000;
               else rb.f &= 0b11101111;
-              if (ram[rb.hl] == 0) rb.f |= 0b10000000;
+              if (readByte(rb.hl) == 0) rb.f |= 0b10000000;
               else rb.f &= 0b01111111;
               rb.f &= 0b10011111;
 
@@ -3720,15 +3720,15 @@ void nextInstruction() {
             break;
           case 0x16:
             {
-              bool carry = ram[rb.hl] & 0b10000000;
+              bool carry = readByte(rb.hl) & 0b10000000;
 
-              writeByte(rb.hl, ram[rb.hl] << 1);
-              writeByte(rb.hl, ram[rb.hl] | ((rb.f >> 4) & 1));
+              writeByte(rb.hl, readByte(rb.hl) << 1);
+              writeByte(rb.hl, readByte(rb.hl) | ((rb.f >> 4) & 1));
 
               if (carry) rb.f |= 0b00010000;
               else rb.f &= 0b11101111;
 
-              if (ram[rb.hl] == 0) rb.f |= 0b10000000;
+              if (readByte(rb.hl) == 0) rb.f |= 0b10000000;
               else rb.f &= 0b01111111;
               rb.f &= 0b10011111;
 
@@ -3889,14 +3889,14 @@ void nextInstruction() {
             break;
           case 0x1E:
             {
-              bool carry = ram[rb.hl] & 0b1;
+              bool carry = readByte(rb.hl) & 0b1;
 
-              writeByte(rb.hl, ram[rb.hl]  >> 1);
-              writeByte(rb.hl, ram[rb.hl]  | (((rb.f >> 4) & 1) << 7));
+              writeByte(rb.hl, readByte(rb.hl)  >> 1);
+              writeByte(rb.hl, readByte(rb.hl)  | (((rb.f >> 4) & 1) << 7));
               if (carry) rb.f |= 0b00010000;
               else rb.f &= 0b11101111;
 
-              if (ram[rb.hl]  == 0) rb.f |= 0b10000000;
+              if (readByte(rb.hl)  == 0) rb.f |= 0b10000000;
               else rb.f &= 0b01111111;
               rb.f &= 0b10011111;
 
@@ -4057,14 +4057,14 @@ void nextInstruction() {
             break;
           case 0x26:
             {
-              bool carry = ram[rb.hl] & 0b10000000;
+              bool carry = readByte(rb.hl) & 0b10000000;
 
-              writeByte(rb.hl, ram[rb.hl] << 1);
+              writeByte(rb.hl, readByte(rb.hl) << 1);
 
               if (carry) rb.f |= 0b00010000;
               else rb.f &= 0b11101111;
 
-              if (ram[rb.hl] == 0) rb.f |= 0b10000000;
+              if (readByte(rb.hl) == 0) rb.f |= 0b10000000;
               else rb.f &= 0b01111111;
               rb.f &= 0b10011111;
 
@@ -4232,15 +4232,15 @@ void nextInstruction() {
             break;
           case 0x2E:
             {
-              bool carry = ram[rb.hl] & 0b1;
+              bool carry = readByte(rb.hl) & 0b1;
 
-              writeByte(rb.hl, ram[rb.hl] >> 1);
+              writeByte(rb.hl, readByte(rb.hl) >> 1);
 
               if (carry) rb.f |= 0b00010000;
               else rb.f &= 0b11101111;
-              writeByte(rb.hl, ram[rb.hl] | ((ram[rb.hl] & 0b01000000) << 1));
+              writeByte(rb.hl, readByte(rb.hl) | ((readByte(rb.hl) & 0b01000000) << 1));
 
-              if (ram[rb.hl] == 0) rb.f |= 0b10000000;
+              if (readByte(rb.hl) == 0) rb.f |= 0b10000000;
               else rb.f &= 0b01111111;
               rb.f &= 0b10011111;
 
@@ -4373,9 +4373,9 @@ void nextInstruction() {
             break;
           case 0x36:
             {
-              writeByte(rb.hl, (ram[rb.hl] >> 4) | (ram[rb.hl] << 4));
+              writeByte(rb.hl, (readByte(rb.hl) >> 4) | (readByte(rb.hl) << 4));
 
-              if (ram[rb.hl] == 0) rb.f |= 0b10000000;
+              if (readByte(rb.hl) == 0) rb.f |= 0b10000000;
               else rb.f &= 0b01111111;
               rb.f &= 0b10001111;
 
@@ -4531,14 +4531,14 @@ void nextInstruction() {
             break;
           case 0x3E:
             {
-              bool carry = ram[rb.hl] & 0b1;
+              bool carry = readByte(rb.hl) & 0b1;
 
-              writeByte(rb.hl, ram[rb.hl] >> 1);
+              writeByte(rb.hl, readByte(rb.hl) >> 1);
 
               if (carry) rb.f |= 0b00010000;
               else rb.f &= 0b11101111;
 
-              if (ram[rb.hl] == 0) rb.f |= 0b10000000;
+              if (readByte(rb.hl) == 0) rb.f |= 0b10000000;
               else rb.f &= 0b01111111;
               rb.f &= 0b10011111;
 
@@ -4664,7 +4664,7 @@ void nextInstruction() {
             break;
           case 0x46:
             {
-              if (ram[rb.hl] & 0b1) rb.f &= 0b01111111;
+              if (readByte(rb.hl) & 0b1) rb.f &= 0b01111111;
               else rb.f |= 0b10000000;
               rb.f &= 0b10111111;
               rb.f |= 0b00100000;
@@ -4784,7 +4784,7 @@ void nextInstruction() {
             break;
           case 0x4E:
             {
-              if (ram[rb.hl] & 0b10) rb.f &= 0b01111111;
+              if (readByte(rb.hl) & 0b10) rb.f &= 0b01111111;
               else rb.f |= 0b10000000;
               rb.f &= 0b10111111;
               rb.f |= 0b00100000;
@@ -4904,7 +4904,7 @@ void nextInstruction() {
             break;
           case 0x56:
             {
-              if (ram[rb.hl] & 0b100) rb.f &= 0b01111111;
+              if (readByte(rb.hl) & 0b100) rb.f &= 0b01111111;
               else rb.f |= 0b10000000;
               rb.f &= 0b10111111;
               rb.f |= 0b00100000;
@@ -5024,7 +5024,7 @@ void nextInstruction() {
             break;
           case 0x5E:
             {
-              if (ram[rb.hl] & 0b1000) rb.f &= 0b01111111;
+              if (readByte(rb.hl) & 0b1000) rb.f &= 0b01111111;
               else rb.f |= 0b10000000;
               rb.f &= 0b10111111;
               rb.f |= 0b00100000;
@@ -5144,7 +5144,7 @@ void nextInstruction() {
             break;
           case 0x66:
             {
-              if (ram[rb.hl] & 0b10000) rb.f &= 0b01111111;
+              if (readByte(rb.hl) & 0b10000) rb.f &= 0b01111111;
               else rb.f |= 0b10000000;
               rb.f &= 0b10111111;
               rb.f |= 0b00100000;
@@ -5264,7 +5264,7 @@ void nextInstruction() {
             break;
           case 0x6E:
             {
-              if (ram[rb.hl] & 0b100000) rb.f &= 0b01111111;
+              if (readByte(rb.hl) & 0b100000) rb.f &= 0b01111111;
               else rb.f |= 0b10000000;
               rb.f &= 0b10111111;
               rb.f |= 0b00100000;
@@ -5384,7 +5384,7 @@ void nextInstruction() {
             break;
           case 0x76:
             {
-              if (ram[rb.hl] & 0b1000000) rb.f &= 0b01111111;
+              if (readByte(rb.hl) & 0b1000000) rb.f &= 0b01111111;
               else rb.f |= 0b10000000;
               rb.f &= 0b10111111;
               rb.f |= 0b00100000;
@@ -5504,7 +5504,7 @@ void nextInstruction() {
             break;
           case 0x7E:
             {
-              if (ram[rb.hl] & 0b10000000) rb.f &= 0b01111111;
+              if (readByte(rb.hl) & 0b10000000) rb.f &= 0b01111111;
               else rb.f |= 0b10000000;
               rb.f &= 0b10111111;
               rb.f |= 0b00100000;
@@ -5606,7 +5606,7 @@ void nextInstruction() {
             break;
           case 0x86:
             {
-              writeByte(rb.hl, ram[rb.hl] & ~0b1);
+              writeByte(rb.hl, readByte(rb.hl) & ~0b1);
 
               if (debug) {
                 printf("RES 0, (HL)");
@@ -5702,7 +5702,7 @@ void nextInstruction() {
             break;
           case 0x8E:
             {
-              writeByte(rb.hl, ram[rb.hl] & ~0b10);
+              writeByte(rb.hl, readByte(rb.hl) & ~0b10);
 
               if (debug) {
                 printf("RES 1, (HL)");
@@ -5798,7 +5798,7 @@ void nextInstruction() {
             break;
           case 0x96:
             {
-              writeByte(rb.hl, ram[rb.hl] & ~0b100);
+              writeByte(rb.hl, readByte(rb.hl) & ~0b100);
 
               if (debug) {
                 printf("RES 2, (HL)");
@@ -5894,7 +5894,7 @@ void nextInstruction() {
             break;
           case 0x9E:
             {
-              writeByte(rb.hl, ram[rb.hl] & ~0b1000);
+              writeByte(rb.hl, readByte(rb.hl) & ~0b1000);
 
               if (debug) {
                 printf("RES 3, (HL)");
@@ -5990,7 +5990,7 @@ void nextInstruction() {
             break;
           case 0xA6:
             {
-              writeByte(rb.hl, ram[rb.hl] & ~0b10000);
+              writeByte(rb.hl, readByte(rb.hl) & ~0b10000);
 
               if (debug) {
                 printf("RES 4, (HL)");
@@ -6086,7 +6086,7 @@ void nextInstruction() {
             break;
           case 0xAE:
             {
-              writeByte(rb.hl, ram[rb.hl] & ~0b100000);
+              writeByte(rb.hl, readByte(rb.hl) & ~0b100000);
 
               if (debug) {
                 printf("RES 5, (HL)");
@@ -6182,7 +6182,7 @@ void nextInstruction() {
             break;
           case 0xB6:
             {
-              writeByte(rb.hl, ram[rb.hl] & ~0b1000000);
+              writeByte(rb.hl, readByte(rb.hl) & ~0b1000000);
 
               if (debug) {
                 printf("RES 6, (HL)");
@@ -6278,7 +6278,7 @@ void nextInstruction() {
             break;
           case 0xBE:
             {
-              writeByte(rb.hl, ram[rb.hl] & ~0b10000000);
+              writeByte(rb.hl, readByte(rb.hl) & ~0b10000000);
 
               if (debug) {
                 printf("RES 7, (HL)");
@@ -6374,7 +6374,7 @@ void nextInstruction() {
             break;
           case 0xC6:
             {
-              writeByte(rb.hl, ram[rb.hl] | 0b1);
+              writeByte(rb.hl, readByte(rb.hl) | 0b1);
 
               if (debug) {
                 printf("SET 0, (HL)");
@@ -6470,7 +6470,7 @@ void nextInstruction() {
             break;
           case 0xCE:
             {
-              writeByte(rb.hl, ram[rb.hl] | 0b10);
+              writeByte(rb.hl, readByte(rb.hl) | 0b10);
 
               if (debug) {
                 printf("SET 1, (HL)");
@@ -6566,7 +6566,7 @@ void nextInstruction() {
             break;
           case 0xD6:
             {
-              writeByte(rb.hl, ram[rb.hl] | 0b100);
+              writeByte(rb.hl, readByte(rb.hl) | 0b100);
 
               if (debug) {
                 printf("SET 2, (HL)");
@@ -6662,7 +6662,7 @@ void nextInstruction() {
             break;
           case 0xDE:
             {
-              writeByte(rb.hl, ram[rb.hl] | 0b1000);
+              writeByte(rb.hl, readByte(rb.hl) | 0b1000);
 
               if (debug) {
                 printf("SET 3, (HL)");
@@ -6758,7 +6758,7 @@ void nextInstruction() {
             break;
           case 0xE6:
             {
-              writeByte(rb.hl, ram[rb.hl] | 0b10000);
+              writeByte(rb.hl, readByte(rb.hl) | 0b10000);
 
               if (debug) {
                 printf("SET 4, (HL)");
@@ -6854,7 +6854,7 @@ void nextInstruction() {
             break;
           case 0xEE:
             {
-              writeByte(rb.hl, ram[rb.hl] | 0b100000);
+              writeByte(rb.hl, readByte(rb.hl) | 0b100000);
 
               if (debug) {
                 printf("SET 5, (HL)");
@@ -6950,7 +6950,7 @@ void nextInstruction() {
             break;
           case 0xF6:
             {
-              writeByte(rb.hl, ram[rb.hl] | 0b1000000);
+              writeByte(rb.hl, readByte(rb.hl) | 0b1000000);
 
               if (debug) {
                 printf("SET 6, (HL)");
@@ -7046,7 +7046,7 @@ void nextInstruction() {
             break;
           case 0xFE:
             {
-              writeByte(rb.hl, ram[rb.hl] | 0b10000000);
+              writeByte(rb.hl, readByte(rb.hl) | 0b10000000);
 
               if (debug) {
                 printf("SET 7, (HL)");
@@ -7076,7 +7076,7 @@ void nextInstruction() {
       break;
     case 0xCC:
       {
-        uint16_t addr = ram[rb.pc+1] | (ram[rb.pc+2] << 8);
+        uint16_t addr = readByte(rb.pc+1) | (readByte(rb.pc+2) << 8);
         rb.pc += 3;
 
         if (rb.f & 0b10000000) {
@@ -7098,7 +7098,7 @@ void nextInstruction() {
       break;
     case 0xCD:
       {
-        uint16_t addr = ram[rb.pc+1] | (ram[rb.pc+2] << 8);
+        uint16_t addr = readByte(rb.pc+1) | (readByte(rb.pc+2) << 8);
         rb.pc += 3;
 
         writeByte(rb.sp -1, (rb.pc & 0xFF00) >> 8);
@@ -7115,7 +7115,7 @@ void nextInstruction() {
       break;
     case 0xCE:
       {
-        uint8_t imm = ram[rb.pc+1];
+        uint8_t imm = readByte(rb.pc+1);
         uint8_t carry = ((rb.f >> 4) & 1);
 
         if ((rb.a & 0xF) + (imm & 0xF) + carry > 0xF) rb.f |= 0b00100000;
@@ -7155,7 +7155,7 @@ void nextInstruction() {
     case 0xD0:
       {
         if (!(rb.f & 0b00010000)) {
-          rb.pc = ram[rb.sp] | ram[rb.sp+1] << 8;
+          rb.pc = readByte(rb.sp) | readByte(rb.sp+1) << 8;
           rb.sp += 2;
 
           time = 20;
@@ -7173,8 +7173,8 @@ void nextInstruction() {
       break;
     case 0xD1:
       {
-        rb.e = ram[rb.sp];
-        rb.d = ram[rb.sp+1];
+        rb.e = readByte(rb.sp);
+        rb.d = readByte(rb.sp+1);
         rb.sp += 2;
 
         if (debug) {
@@ -7187,7 +7187,7 @@ void nextInstruction() {
       break;
     case 0xD2:
       {
-        uint16_t addr = ram[rb.pc+1] | (ram[rb.pc+2] << 8);
+        uint16_t addr = readByte(rb.pc+1) | (readByte(rb.pc+2) << 8);
 
         if (!(rb.f & 0b00010000)) {
           rb.pc = addr;
@@ -7207,7 +7207,7 @@ void nextInstruction() {
       break;
     case 0xD4:
       {
-        uint16_t addr = ram[rb.pc+1] | (ram[rb.pc+2] << 8);
+        uint16_t addr = readByte(rb.pc+1) | (readByte(rb.pc+2) << 8);
         rb.pc += 3;
 
         if (!(rb.f & 0b00010000)) {
@@ -7243,7 +7243,7 @@ void nextInstruction() {
       break;
     case 0xD6:
       {
-        uint8_t imm = ram[rb.pc+1];
+        uint8_t imm = readByte(rb.pc+1);
 
         if (((int)(rb.a & 0xF) - (int)(imm & 0xF)) < 0) rb.f |= 0b00100000;
         else rb.f &= ~0b00100000;
@@ -7282,7 +7282,7 @@ void nextInstruction() {
     case 0xD8:
       {
         if (rb.f & 0b00010000) {
-          rb.pc = ram[rb.sp] | ram[rb.sp+1] << 8;
+          rb.pc = readByte(rb.sp) | readByte(rb.sp+1) << 8;
           rb.sp += 2;
 
           time = 20;
@@ -7300,7 +7300,7 @@ void nextInstruction() {
       break;
     case 0xD9:
       {
-        rb.pc = ram[rb.sp] | ram[rb.sp+1] << 8;
+        rb.pc = readByte(rb.sp) | readByte(rb.sp+1) << 8;
         rb.sp += 2;
         IME = true;
 
@@ -7313,7 +7313,7 @@ void nextInstruction() {
       break;
     case 0xDA:
       {
-        uint16_t addr = ram[rb.pc+1] | (ram[rb.pc+2] << 8);
+        uint16_t addr = readByte(rb.pc+1) | (readByte(rb.pc+2) << 8);
 
         if (rb.f & 0b00010000) {
           rb.pc = addr;
@@ -7333,7 +7333,7 @@ void nextInstruction() {
       break;
     case 0xDC:
       {
-        uint16_t addr = ram[rb.pc+1] | (ram[rb.pc+2] << 8);
+        uint16_t addr = readByte(rb.pc+1) | (readByte(rb.pc+2) << 8);
         rb.pc += 3;
 
         if (rb.f & 0b00010000) {
@@ -7355,7 +7355,7 @@ void nextInstruction() {
       break;
     case 0xDE:
       {
-        uint8_t imm = ram[rb.pc+1];
+        uint8_t imm = readByte(rb.pc+1);
         uint8_t carry = ((rb.f >> 4) & 1);
 
         if ((int)(rb.a & 0xF) - (int)(imm & 0xF) - (int)carry < 0) rb.f |= 0b00100000;
@@ -7394,7 +7394,7 @@ void nextInstruction() {
       break;
     case 0xE0:
       {
-        uint16_t imm = ram[rb.pc+1];
+        uint16_t imm = readByte(rb.pc+1);
         imm += 0xFF00;
         writeByte(imm, rb.a);
 
@@ -7408,8 +7408,8 @@ void nextInstruction() {
       break;
     case 0xE1:
       {
-        rb.l = ram[rb.sp];
-        rb.h = ram[rb.sp+1];
+        rb.l = readByte(rb.sp);
+        rb.h = readByte(rb.sp+1);
         rb.sp += 2;
 
         if (debug) {
@@ -7450,7 +7450,7 @@ void nextInstruction() {
       break;
     case 0xE6:
       {
-        uint8_t imm = ram[rb.pc+1];
+        uint8_t imm = readByte(rb.pc+1);
         rb.a = rb.a & imm;
 
         if (rb.a == 0) rb.f |= 0b10000000;
@@ -7483,7 +7483,7 @@ void nextInstruction() {
       break;
     case 0xE8:
       {
-        int8_t imm = ram[rb.pc+1];
+        int8_t imm = readByte(rb.pc+1);
 
         if (imm >= 0) {
           if ((rb.sp & 0xF) + (imm & 0xF) > 0xF) rb.f |= 0b00100000;
@@ -7524,7 +7524,7 @@ void nextInstruction() {
       break;
     case 0xEA:
       {
-        uint16_t addr = ram[rb.pc+1] | (ram[rb.pc+2] << 8);
+        uint16_t addr = readByte(rb.pc+1) | (readByte(rb.pc+2) << 8);
         writeByte(addr, rb.a);
 
         if (debug) {
@@ -7537,7 +7537,7 @@ void nextInstruction() {
       break;
     case 0xEE:
       {
-        uint8_t imm = ram[rb.pc+1];
+        uint8_t imm = readByte(rb.pc+1);
 
         rb.a = rb.a ^ imm;
 
@@ -7570,9 +7570,9 @@ void nextInstruction() {
       break;
     case 0xF0:
       {
-        uint16_t imm = ram[rb.pc+1];
+        uint16_t imm = readByte(rb.pc+1);
         imm += 0xFF00;
-        rb.a = ram[imm];
+        rb.a = readByte(imm);
 
         if (debug) {
           printf("LDH A, (0x%04X)", imm);
@@ -7584,8 +7584,8 @@ void nextInstruction() {
       break;
     case 0xF1:
       {
-        rb.f = ram[rb.sp];
-        rb.a = ram[rb.sp+1];
+        rb.f = readByte(rb.sp);
+        rb.a = readByte(rb.sp+1);
         rb.sp += 2;
 
         if (debug) {
@@ -7600,7 +7600,7 @@ void nextInstruction() {
       {
         uint16_t imm = rb.c;
         imm += 0xFF00;
-        rb.a = ram[imm];
+        rb.a = readByte(imm);
 
         if (debug) {
           printf("LDH A, (C)");
@@ -7638,7 +7638,7 @@ void nextInstruction() {
       break;
     case 0xF6:
       {
-        uint8_t imm = ram[rb.pc+1];
+        uint8_t imm = readByte(rb.pc+1);
 
         rb.a |= imm;
 
@@ -7671,7 +7671,7 @@ void nextInstruction() {
       break;
     case 0xF8:
       {
-        int8_t imm = ram[rb.pc+1];
+        int8_t imm = readByte(rb.pc+1);
 
         if (imm >= 0) {
           if ((rb.sp & 0xF) + (imm & 0xF) > 0xF) rb.f |= 0b00100000;
@@ -7712,9 +7712,9 @@ void nextInstruction() {
       break;
     case 0xFA:
       {
-        uint16_t addr = ram[rb.pc+1] | (ram[rb.pc+2] << 8);
+        uint16_t addr = readByte(rb.pc+1) | (readByte(rb.pc+2) << 8);
 
-        rb.a = ram[addr];
+        rb.a = readByte(addr);
 
         if (debug) {
           printf("LD A, (0x%04X)", addr);
@@ -7738,7 +7738,7 @@ void nextInstruction() {
       break;
     case 0xFE:
       {
-        uint8_t imm = ram[rb.pc+1];
+        uint8_t imm = readByte(rb.pc+1);
 
         uint16_t temp = rb.a - imm;
         if (temp == 0) rb.f |= 0b10000000;
