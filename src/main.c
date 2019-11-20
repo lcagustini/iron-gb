@@ -421,11 +421,6 @@ int main(int argc, char* argv[]) {
 
   SDL_Event e;
   while(1){
-    while(SDL_PollEvent(&e)){
-      if(e.type == SDL_QUIT)
-        exit(0);
-    }
-
     if (BIOS == MAPPED && rb.pc == 0x100) {
       BIOS = UNMAPPED;
       rewind(cartridge.rom);
@@ -572,6 +567,11 @@ int main(int argc, char* argv[]) {
             //puts("");
 
             ram[LY] = 0;
+
+            while(SDL_PollEvent(&e)){
+              if(e.type == SDL_QUIT)
+                exit(0);
+            }
           }
         }
         break;
