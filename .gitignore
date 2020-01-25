@@ -4,3 +4,7 @@ bin/
 *.sav
 dump
 roms/
+*.PBP
+*.SFO
+*.elf
+*.o

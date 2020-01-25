@@ -1,13 +1,20 @@
-all:
-	@mkdir -p bin
-	gcc src/main.c -o bin/main -lSDL2 -O3 -march=native -Wall
+TARGET = irongb
+OBJS = src/main.o
 
-debug:
-	@mkdir -p bin
-	gcc src/main.c -o bin/main -lSDL2 -Og -ggdb -g3 -fno-omit-frame-pointer
+INCDIR =
+CFLAGS = -G0 -Wall -O2 -std=c11
+CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti
+ASFLAGS = $(CFLAGS)
 
-run: all
-	./bin/main tetris.gb
+LIBDIR = ./lib/
+LIBS = -lSDL2
+LIBS += -lpspaudiolib -lpspaudio
+LIBS += -lpspgum -lpspgu -lm
+LIBS += -lglut -lGLU -lGL
+LIBS += -lpsprtc -lpspvfpu -lpspvram  -lpsphprm
 
-clean:
-	rm -rf bin
+EXTRA_TARGETS = EBOOT.PBP
+PSP_EBOOT_TITLE = IronGB
+
+PSPSDK=$(shell psp-config --pspsdk-path)
+include $(PSPSDK)/lib/build.mak

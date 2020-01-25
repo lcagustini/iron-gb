@@ -1,3 +1,4 @@
+#if 0
 void mem_dump(uint16_t start, uint16_t end) {
   int i, j;
   for (i = start; i <= end; i += 16) {
@@ -23,6 +24,7 @@ void mem_dump(uint16_t start, uint16_t end) {
     printf("|\n");
   }
 }
+#endif
 
 void DMATransfer() {
   uint16_t source = ram[DMA] * 0x100;

@@ -1,8 +1,24 @@
-#include <SDL2/SDL.h>
-
-#include <stdint.h>
-#include <stdio.h>
+#include <pspkernel.h>
+#include <pspdisplay.h>
+#include <pspdebug.h>
 #include <stdlib.h>
+#include <stdio.h>
+#include <math.h>
+#include <string.h>
+#include <pspctrl.h>
+
+#include <pspgu.h>
+#include <pspgum.h>
+
+#include "include/SDL.h"
+
+/* Define the module info section */
+PSP_MODULE_INFO("IRONGB", 0, 1, 1);
+/* Define the main thread's attribute value (optional) */
+PSP_MAIN_THREAD_ATTR(THREAD_ATTR_USER | THREAD_ATTR_VFPU);
+PSP_HEAP_SIZE_MAX();
+/* Define printf, just to make typing easier */
+//#define printf	pspDebugScreenPrintf
 
 #define COLOR_BLUE "\033[0;34m"
 #define COLOR_RED "\033[31m"
@@ -54,7 +70,7 @@
 #define true 1
 #define false 0
 
-#define ZOOM 3
+#define ZOOM 1
 
 struct {
   struct {
@@ -417,7 +433,7 @@ int main(int argc, char* argv[]) {
       screen_surface->format->Rmask, screen_surface->format->Gmask,
       screen_surface->format->Bmask, screen_surface->format->Amask);
 
-  loadCartridge(argv[1]);
+  loadCartridge("tetris.gb");
 
   SDL_Event e;
   while(1){
